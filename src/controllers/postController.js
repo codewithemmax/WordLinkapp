@@ -1,9 +1,8 @@
 import Post from "../models/PostModel.js";
-
-// Get all posts
 export const getPosts = async (req, res) => {
   try {
-    const userId = req.user?.id; // optional if not logged in
+    console.log("Get post")
+    const userId = req.user?.id
     const posts = await Post.find();
 
     const formatted = posts.map(post => ({
@@ -14,12 +13,16 @@ export const getPosts = async (req, res) => {
       likes: post.likes,
       comments: post.comments,
       createdAt: post.createdAt,
-      isLiked: userId ? post.likedBy.includes(userId) : false, // 👈 key part
+      isLiked: userId ? post.likedBy.includes(userId) : false // 👈 key part
     }));
 
-    res.json(formatted);
+    return res.json(formatted);
+    if (userId){
+    	console.log(post.likedBy)
+    	console.log(userId)
+    }
   } catch (err) {
-    res.status(500).json({ message: "Error fetching posts" });
+    return res.status(500).json({ message: "Error fetching posts" });
   }
 };
 // Like a post

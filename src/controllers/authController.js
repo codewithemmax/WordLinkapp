@@ -2,6 +2,18 @@ import User from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
+// Get all posts
+export const getProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const userProfile = await User.findById(userId)
+    console.log(userProfile)
+    return res.json(userProfile)
+  }catch(err){
+  	return res.status(404).json({message: "Server error"})
+  }
+}
+
 export const signUp = async (req, res) => {
   const { username, firstname, lastname, email, password } = req.body;
   const userN = await User.findOne({ username: username });
@@ -22,6 +34,7 @@ export const signUp = async (req, res) => {
 };
 
 export const logIn = async (req, res) => {
+  try{
   const { usernameOrEmail, password } = req.body;
   const user = await User.findOne({
     $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
@@ -44,11 +57,14 @@ export const logIn = async (req, res) => {
         { expiresIn: "7d" }
       );
 
-      res.json({ token });
+      return res.json({ token });
     } else {
       return res.status(401).json({ message: "Invalid Credentials" });
     }
   } else {
-    return res.json({ message: "Invalid Credentials" });
+    return res.status(404).json({ message: "Invalid Credentials" });
+  }
+  }catch(err){
+  	return res.status(404).json({message: "Server error"})
   }
 };

@@ -6,6 +6,8 @@ const userSchema = new mongoose.Schema(
     lastname: { type: String, required: true },
     email: { type: String, required: true },
     passwordHashed: { type: String, required: true },
+    followers: {type: [mongoose.Schema.Types.ObjectId], default: []},
+    followings: {type: [mongoose.Schema.Types.ObjectId], default: []}
   },
   { timestamps: true }
 );

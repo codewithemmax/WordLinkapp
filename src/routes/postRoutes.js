@@ -6,13 +6,13 @@ import {
   deletePost,
   updatePost,
   likePost,
-  commentPost,
+  commentPost
 } from "../controllers/postController.js";
-import { authenticateToken } from "../middleware/authMiddleware.js";
+import { optionalAuthenticateToken, authenticateToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", getPosts);
+router.get("/", optionalAuthenticateToken, getPosts);
 router.post("/", authenticateToken, createPost);
 router.get("/:id", getPost);
 router.put("/:id", updatePost);
