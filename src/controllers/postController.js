@@ -1,7 +1,15 @@
 import Post from "../models/PostModel.js";
+import fs from "fs";
+import crypto from "crypto";
+import { v2 as cloudinary } from 'cloudinary';
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET
+});
+
 export const getPosts = async (req, res) => {
   try {
-    console.log("Get post")
     const userId = req.user?.id
     const posts = await Post.find();
 
@@ -10,6 +18,7 @@ export const getPosts = async (req, res) => {
       username: post.username,
       fullname: post.fullname,
       content: post.content,
+      imageUrl: post.imageUrl,
       likes: post.likes,
       comments: post.comments,
       createdAt: post.createdAt,
@@ -51,14 +60,14 @@ export const likePost = async (req, res) => {
 
     await post.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: alreadyLiked ? "Unliked post" : "Liked post",
       likes: post.likes,
       isLiked: !alreadyLiked, // important for frontend toggle
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 // Add a comment
@@ -81,17 +90,50 @@ export const commentPost = async (req, res) => {
 export const createPost = async (req, res) => {
   try {
     // content is sent from the frontend
-    const { content } = req.body;
+    const { text } = req.body;
+    const imageFile = req.file;
+    
+    // Validate
+    
+    let imageUrl = null;
+    
+    // Upload to Cloudinary if image exists
+    if (imageFile) {
+      console.log('Uploading to Cloudinary...');
+      const timestamp = Math.floor(Date.now() / 1000);
+
+      // Params to sign
+      const signature = crypto
+        .createHash("sha1")
+        .update(
+          `folder=wordlink_posts&timestamp=${timestamp}${process.env.CLOUD_API_SECRET}`
+        )
+        .digest("hex");
+
+      const result = await cloudinary.uploader.upload(imageFile.path, {
+        folder: "wordlink_posts",
+        timestamp,
+        signature,
+        api_key: process.env.CLOUD_API_KEY
+      });
+
+      imageUrl = result.secure_url;
+
+      fs.unlinkSync(imageFile.path)
+      
+      console.log('Upload successful:', imageUrl);
+    }
 
     // Check if content is empty
-    if (!content || content.trim() === "") {
+    if (!text || text.trim() === "") {
       return res.status(400).json({ message: "Post content cannot be empty." });
     }
 
     // req.user is set by authenticateToken middleware
     const newPost = new Post({
       username: req.user.username, // comes from the decoded token
-      content: content,
+      content: text,
+      imageUrl: imageUrl,
       fullname: req.user.fullname,
       createdAt: new Date(),
       likes: 0,
@@ -99,12 +141,12 @@ export const createPost = async (req, res) => {
     });
 
     await newPost.save();
-    res
+    return res
       .status(201)
       .json({ message: "Post created successfully!", post: newPost });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error while creating post." });
+    return res.status(500).json({ message: "Server error while creating post." });
   }
 };
 

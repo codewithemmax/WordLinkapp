@@ -9,11 +9,15 @@ import {
   commentPost
 } from "../controllers/postController.js";
 import { optionalAuthenticateToken, authenticateToken } from "../middleware/authMiddleware.js";
+import multer from 'multer'
 
 const router = express.Router();
-
+const upload = multer({ 
+  dest: 'uploads/',
+  limits: { fileSize: 5 * 1024 * 1024 }  // 5MB max
+});
 router.get("/", optionalAuthenticateToken, getPosts);
-router.post("/", authenticateToken, createPost);
+router.post("/", authenticateToken, upload.single('image'), createPost);
 router.get("/:id", getPost);
 router.put("/:id", updatePost);
 router.delete("/:id", deletePost);

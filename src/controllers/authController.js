@@ -7,10 +7,9 @@ export const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     const userProfile = await User.findById(userId)
-    console.log(userProfile)
     return res.json(userProfile)
   }catch(err){
-  	return res.status(404).json({message: "Server error"})
+    return res.status(404).json({message: "Error getting profilr"})
   }
 }
 
@@ -34,13 +33,10 @@ export const signUp = async (req, res) => {
 };
 
 export const logIn = async (req, res) => {
-  try{
   const { usernameOrEmail, password } = req.body;
   const user = await User.findOne({
     $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
   });
-  console.log(user);
-  console.log("Click");
   if (user) {
     const confirmPassword = await bcrypt.compare(password, user.passwordHashed);
 
@@ -57,14 +53,11 @@ export const logIn = async (req, res) => {
         { expiresIn: "7d" }
       );
 
-      return res.json({ token });
+      res.json({ token });
     } else {
       return res.status(401).json({ message: "Invalid Credentials" });
     }
   } else {
     return res.status(404).json({ message: "Invalid Credentials" });
-  }
-  }catch(err){
-  	return res.status(404).json({message: "Server error"})
   }
 };

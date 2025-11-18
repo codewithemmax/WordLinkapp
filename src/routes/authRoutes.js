@@ -1,11 +1,11 @@
 import express from "express";
 import { logIn, signUp, getProfile } from "../controllers/authController.js";
-import { optionalAuthenticateToken, authenticateToken } from "../middleware/authMiddleware.js";
+import { authenticateToken } from "../middleware/authMiddleware.js";
 
-const app = express.Router();
+const router = express.Router();
 
-app.post("/signup", signUp);
-app.post("/login", logIn);
-app.get("/profile", authenticateToken, getProfile)
+router.post("/signup", signUp);
+router.post("/login", logIn);
+router.get("/profile", authenticateToken, getProfile);
 
-export default app;
+export default router;

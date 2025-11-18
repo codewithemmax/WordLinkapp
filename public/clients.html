@@ -167,9 +167,13 @@
     font-family: 'Inter', sans-serif;
   }
 
-  .post-card p {
+  .content {
     margin-top: 10px;
     font-size: 14px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;      /* Limits the text to 3 lines */
+    -webkit-box-orient: vertical;
     line-height: 1.5;
     font-family: 'Inter', sans-serif;
     color: #333;
@@ -200,7 +204,7 @@
   }
 
   .post-tail svg {
-    font-size: 15px;
+    font-size: 20px;
     width: 1em;
     height: 1em;
   }
@@ -300,13 +304,28 @@ li:hover {
     border: 5px;
   }
   
+  .readmore{
+    border: 0;
+    font-size: 15px;
+    outline: 0;
+    padding: 2px;
+  }
+  
   .sidebar-profile p:first-of-type {
     font-weight: 600;
+    white-space: nowrap;      /* Prevents the text from wrapping to a new line */
+    overflow: hidden;         /* Hides the overflowing text */
+    text-overflow: ellipsis;  /* Displays the ellipsis (...) for the clipped text */
+    max-width: 200px;  
     font-family: 'Montserrat', sans-serif;
   }
 
   .sidebar-profile p:last-of-type {
     color: grey;
+    white-space: nowrap;      /* Prevents the text from wrapping to a new line */
+    overflow: hidden;         /* Hides the overflowing text */
+    text-overflow: ellipsis;  /* Displays the ellipsis (...) for the clipped text */
+    max-width: 200px;  
     font-family: 'Inter', sans-serif;
   }
 
@@ -323,12 +342,15 @@ li:hover {
   .follows{
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    text-align: center;
   }
   
-  .follows span{
-    width: 100%;
+  .post-image{
+    width:100%;
+    height:auto;
+    max-height:500px;
+    object-fit:cover;
+    object-position:center;
+    border-radius:18px;
   }
   
   /* Tablet and up (768px+) */
@@ -382,8 +404,8 @@ li:hover {
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="currentColor"
+        id="post-btn"
         class="size-6"
-        id="post-icon"
       >
         <path
           fill-rule="evenodd"
@@ -408,11 +430,21 @@ li:hover {
     menu.addEventListener('click', (e) => {
       sidebar.classList.toggle("active")
     })
+    const postBtn = document.querySelector("#post-btn")
+    postBtn.addEventListener('click', (e) => {
+      if (token){
+        window.location.href = "post.html"
+      }else{
+        alert("User not logged in")
+      }
+    })
     
 postDiv.addEventListener('click', async (e) => {
+  const readmore = e.target.closest('.readmore')
   const btn = e.target.closest('#like-btn'); // check if the clicked element is a like button
   if (!btn) return; // not a like button
 
+  
   const postCard = btn.closest('.post-card');
   const postId = postCard.dataset.id;
 
@@ -496,8 +528,8 @@ const response = await fetch("http://localhost:2345/api/posts", {
     const data = await response.json()
     sidebar.innerHTML = `
       <div class="sidebar-profile">
-       <img src="../images/profile.png" alt="."/>
-       <p>${data.fullname}</p>
+       <img src="../images/profile1.webp" alt="."/>
+       <p>${data.firstname + " " +data.lastname}</p>
        <p>${data.username}</p>
        <div class="follow">
         <div class="follows">
@@ -547,7 +579,7 @@ const response = await fetch("http://localhost:2345/api/posts", {
         <div class="seperator"></div>
         <div class="post-header">
           <div class="post-profile">
-            <img src="../images/profile.png" alt="." />
+            <img src="../images/profile1.webp" alt="." />
             <div class="post-text">
               <span>${posts.fullname}</span>
               <span>${posts.username}</span>
@@ -559,7 +591,8 @@ const response = await fetch("http://localhost:2345/api/posts", {
 
 
         </div>
-        <p>${posts.content}</p>
+        <span class="content">${posts.content} <button class="readmore">Read more</button></span>
+        ${posts.imageUrl ? `<img class="post-image" src="${posts.imageUrl}" alt="image"/>` : ""}
         <div class="post-tail">
           <svg
           id="like-btn"
@@ -574,9 +607,10 @@ const response = await fetch("http://localhost:2345/api/posts", {
               </svg>
           <span class="comments">${posts.comments.length}</span>
 
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
-                  </svg>
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
+</svg>
+
               <span class="shares">0</span>
         </div>
       </div>
