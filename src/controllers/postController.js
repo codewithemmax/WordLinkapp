@@ -1,12 +1,100 @@
+// ...existing code...
 import Post from "../models/PostModel.js";
 import fs from "fs";
-import crypto from "crypto";
 import { v2 as cloudinary } from 'cloudinary';
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET
 });
+if (!process.env.CLOUD_NAME || !process.env.CLOUD_API_KEY || !process.env.CLOUD_API_SECRET) {
+  console.error('Cloudinary env vars missing: ensure CLOUD_NAME, CLOUD_API_KEY, CLOUD_API_SECRET are set');
+}
+// ...existing code...
+
+// inside createPost — replace the image upload block with the following:
+export const createPost = async (req, res) => {
+  try {
+    // content is sent from the frontend
+    const { text } = req.body;
+    const imageFile = req.file;
+    
+    // Validate
+    
+    let imageUrl = null;
+    
+    // Upload to Cloudinary if image exists
+    if (imageFile) {
+      console.log('Uploading to Cloudinary...');
+      const uploadWithTimeout = (filePath, timeoutMs = 60000) => {
+        return new Promise((resolve, reject) => {
+          const uploadPromise = cloudinary.uploader.upload(filePath, { folder: "wordlink_posts" });
+          const to = setTimeout(() => {
+            reject(new Error('Cloudinary upload timed out'));
+          }, timeoutMs);
+
+          uploadPromise
+            .then((r) => { clearTimeout(to); resolve(r); })
+            .catch((e) => { clearTimeout(to); reject(e); });
+        });
+      };
+
+      // retry logic
+      const maxRetries = 3;
+      let attempt = 0;
+      let lastError = null;
+      try {
+        while (attempt < maxRetries) {
+          attempt++;
+          try {
+            const result = await uploadWithTimeout(imageFile.path, 60000); // 60s per attempt
+            imageUrl = result.secure_url;
+            console.log('Upload successful:', imageUrl, 'attempt', attempt);
+            break;
+          } catch (err) {
+            lastError = err;
+            console.warn(`Upload attempt ${attempt} failed:`, err.message || err);
+            if (attempt < maxRetries) {
+              // exponential backoff
+              await new Promise(r => setTimeout(r, 500 * Math.pow(2, attempt)));
+            }
+          }
+        }
+      } finally {
+        // always clean up temp file
+        if (fs.existsSync(imageFile.path)) {
+          try { fs.unlinkSync(imageFile.path); } catch (e) { console.warn('Failed to remove temp file', e); }
+        }
+      }
+    }
+
+
+    // Check if content is empty
+    if (!text || text.trim() === "") {
+      return res.status(400).json({ message: "Post content cannot be empty." });
+    }
+
+    // req.user is set by authenticateToken middleware
+    const newPost = new Post({
+      username: req.user.username, // comes from the decoded token
+      content: text,
+      imageUrl: imageUrl,
+      fullname: req.user.fullname,
+      createdAt: new Date(),
+      likes: 0,
+      comments: [],
+    });
+
+    await newPost.save();
+    return res
+      .status(201)
+      .json({ message: "Post created successfully!", post: newPost });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error while creating post." });
+  }
+};
+// ...existing code...
 
 export const getPosts = async (req, res) => {
   try {
@@ -84,70 +172,6 @@ export const commentPost = async (req, res) => {
   await post.save();
 
   res.json({ message: "Comment added" });
-};
-
-// ✅ CREATE a new post
-export const createPost = async (req, res) => {
-  try {
-    // content is sent from the frontend
-    const { text } = req.body;
-    const imageFile = req.file;
-    
-    // Validate
-    
-    let imageUrl = null;
-    
-    // Upload to Cloudinary if image exists
-    if (imageFile) {
-      console.log('Uploading to Cloudinary...');
-      const timestamp = Math.floor(Date.now() / 1000);
-
-      // Params to sign
-      const signature = crypto
-        .createHash("sha1")
-        .update(
-          `folder=wordlink_posts&timestamp=${timestamp}${process.env.CLOUD_API_SECRET}`
-        )
-        .digest("hex");
-
-      const result = await cloudinary.uploader.upload(imageFile.path, {
-        folder: "wordlink_posts",
-        timestamp,
-        signature,
-        api_key: process.env.CLOUD_API_KEY
-      });
-
-      imageUrl = result.secure_url;
-
-      fs.unlinkSync(imageFile.path)
-      
-      console.log('Upload successful:', imageUrl);
-    }
-
-    // Check if content is empty
-    if (!text || text.trim() === "") {
-      return res.status(400).json({ message: "Post content cannot be empty." });
-    }
-
-    // req.user is set by authenticateToken middleware
-    const newPost = new Post({
-      username: req.user.username, // comes from the decoded token
-      content: text,
-      imageUrl: imageUrl,
-      fullname: req.user.fullname,
-      createdAt: new Date(),
-      likes: 0,
-      comments: [],
-    });
-
-    await newPost.save();
-    return res
-      .status(201)
-      .json({ message: "Post created successfully!", post: newPost });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error while creating post." });
-  }
 };
 
 // Get single post

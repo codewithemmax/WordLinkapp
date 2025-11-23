@@ -343,34 +343,83 @@ li:hover {
     display: flex;
     flex-direction: column;
   }
-  
+
   .post-image{
-    width:100%;
-    height:auto;
-    max-height:500px;
-    object-fit:cover;
-    object-position:center;
-    border-radius:18px;
-  }
+  /* Spacing: Adds margin to separate the image from the text/tail. */
+  margin-top: 10px; /* Space above image */
+  margin-bottom: 5px; /* Space below image */
+
+  /* Dimensions & Fit: Keeps image responsive but prevents excessive size. */
+  width: 100%;
+  height: auto;
+  max-height: 500px; 
   
-  /* Tablet and up (768px+) */
-@media (min-width: 768px) {
-  .sidebar {
-    width: 220px;
-    color: #fff;
-    position: fixed;
-    left: 0;
-    z-index: 0;
-    top: 0;
-    transition: transform 0.3s ease;
-  }
+  /* Visual: Ensures clean edges and a subtle shadow. */
+  border: 1px solid #e0e0e0; /* Add a very light border for definition */
+  outline: 0;
+  border-radius: 12px; /* Slightly less aggressive border radius than 18px */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+  
+  /* Positioning: Controls how the image content fills the container. */
+  object-fit: cover;
+  object-position: center;
 }
 
-/* Laptop and up (1024px+) */
+  /* Laptop and up (1024px+) */
 @media (min-width: 1024px) {
+  /* 1. MAIN LAYOUT: Set up the body to use CSS Grid for a 2-column layout.
+     The first column is the sidebar (220px), the second is the main content.
+     We center the whole layout in the screen using a max-width on the body.
+  */
+  body {
+    display: grid;
+    grid-template-columns: 220px 1fr; /* Sidebar fixed width, main content fills */
+    width: 100%; /* Limit overall width for aesthetics */
+    margin: 0 auto; /* Center the layout on the screen */
+  }
+
+  /* 2. SIDEBAR: Make it permanently visible and fixed.
+     We need to remove the mobile-style `position: fixed` or `transform` 
+     and make it part of the main grid flow.
+  */
   .sidebar {
-    transform: translateX(0); /* always visible */
-    position: relative;
+    position: sticky; /* Keep it visible while scrolling the main content */
+    top: 0;
+    height: 100vh; /* Make it full height */
+    transform: translateX(0); /* Ensure it's always visible */
+    z-index: 10;
+    overflow-x: hidden;
+    left: 0;
+    border-right: 1px solid #e0e0e0; /* Visual separation from content */
+  }
+
+  /* 3. MAIN CONTENT: Center the main content area (the div containing nav/posts) 
+     and adjust its padding. 
+  */
+  div { /* This targets the <div> containing the nav, posts, etc. */
+    padding: 0;
+  }
+  .post-home {
+    max-width: 700px; /* Limit width for readability */
+    overflow-y: auto;
+  }
+
+  /* 4. HIDE MOBILE MENU: The menu icon is no longer needed on PC.
+  */
+  #menu-icon {
+    display: none;
+  }
+
+  /* 5. NAV BAR: Adjust the navigation to compensate for the removed menu icon space.
+  */
+  nav {
+    padding-left: 20px; 
+    /* The sidebar is now separate, so adjust padding to keep it clean */
+  }
+  
+  .home-title2 {
+    /* Since the menu icon is hidden, we remove its influence on the title */
+    gap: 10px;
   }
 }
 
@@ -405,6 +454,7 @@ li:hover {
         viewBox="0 0 24 24"
         fill="currentColor"
         id="post-btn"
+        style="color: #0A84FF;"
         class="size-6"
       >
         <path
@@ -414,13 +464,15 @@ li:hover {
         />
       </svg>
     </nav>
-    <p class="home-title">Home</p>
-    <div class="post-container">
-      <textarea id="postContent" placeholder="What's on your mind?"></textarea>
-      <button onclick="createPost()">Post</button>
+    <div class="post-home">
+      <p class="home-title">Home</p>
+      <div class="post-container">
+        <textarea id="postContent" placeholder="What's on your mind?"></textarea>
+        <button onclick="createPost()">Post</button>
+      </div>
+      <section class="post-section">
+      </section>
     </div>
-    <section class="post-section">
-    </section>
   </div>
   <script>
         const postDiv = document.querySelector('.post-section')
@@ -591,7 +643,7 @@ const response = await fetch("http://localhost:2345/api/posts", {
 
 
         </div>
-        <span class="content">${posts.content} <button class="readmore">Read more</button></span>
+        <span class="content">${posts.content}</span>
         ${posts.imageUrl ? `<img class="post-image" src="${posts.imageUrl}" alt="image"/>` : ""}
         <div class="post-tail">
           <svg
