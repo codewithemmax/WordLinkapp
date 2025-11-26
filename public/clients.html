@@ -524,12 +524,10 @@ postDiv.addEventListener('click', async (e) => {
       const content = document.getElementById("postContent").value.trim();
       try {
         if (!token) {
-          alert("You must be logged in to post");
            return;
         }
 
         if (!content || content.trim() === "") {
-          alert("Post content cannot be empty");
           return;
          }
 
@@ -580,7 +578,7 @@ const response = await fetch("http://localhost:2345/api/posts", {
     const data = await response.json()
     sidebar.innerHTML = `
       <div class="sidebar-profile">
-       <img src="../images/profile1.webp" alt="."/>
+       <img src=${data.profilePic || "../images/profile1.webp"} alt="."/>
        <p>${data.firstname + " " +data.lastname}</p>
        <p>${data.username}</p>
        <div class="follow">

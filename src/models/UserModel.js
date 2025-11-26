@@ -3,6 +3,7 @@ const userSchema = new mongoose.Schema(
   {
     username: { type: String, required: true },
     firstname: { type: String, required: true },
+    profilePic: { type: String, default: null },
     lastname: { type: String, required: true },
     email: { type: String, required: true },
     passwordHashed: { type: String, required: true },
