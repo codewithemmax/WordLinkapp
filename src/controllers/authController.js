@@ -21,7 +21,7 @@ export const check = async (req, res) => {
   if (userN) {
     return res.status(404).json({ message: "Username has already been taken" });
   }else{
-    return res.status(200)
+    return res.status(200).json({ message: "Available" });
   }
 }
 
@@ -40,18 +40,21 @@ export const signUp = async (req, res) => {
         .status(404)
         .json({ message: "Email has already been registered" });
     }
-
-    if(imageFile){
-      const result = cloudinary.uploader.upload(imageFile.path, { folder: "wordlink_posts" });
-      imageUrl = result.secure_url;
+    console.log("Uploading image to cloudinary...");
+    let profilePic = "";
+    if (imageFile) {
+      const result = await cloudinary.uploader.upload(imageFile.path, { folder: "wordlink_posts" });
+      profilePic = result.secure_url;
     }
 
+
     const passwordHashed = await bcrypt.hash(password, 10);
-    const user = User({ firstname, lastname, username, email, passwordHashed, profilePic: imageUrl });
+    const user = new User({ username, firstname, profilePic, lastname, email, passwordHashed});
     await user.save();
     res.json({ message: "Successful created an account " });
     console.log("Successfully created ");
   }catch(err){
+    console.error("Error during sign up:", err);
     return res.status(500).json({ message: "Error creating an account" });
   }
 };
@@ -72,6 +75,7 @@ export const logIn = async (req, res) => {
           id: user._id,
           username: user.username,
           fullname: `${user.firstname} ${user.lastname}`,
+          profilePic: user.profilePic
         },
         process.env.JWT_SECRET,
         { expiresIn: "7d" }

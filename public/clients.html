@@ -15,7 +15,7 @@
     margin: 0;
     overflow-y: auto;
     padding: 0;
-    background-color: #f9f9f9;
+    background-color: white
   }
 
   nav {
@@ -94,6 +94,7 @@
     width: 70px;
     text-align: center;
     color: white;
+    
     border: none;
     background: linear-gradient(90deg, #6a5acd, #4169e1);
     padding: 7px 10px;
@@ -129,6 +130,10 @@
     padding: 5px 15px;
     border-radius: 8px;
     font-family: 'Inter', sans-serif;
+  }
+
+  .post-content:active{
+    background-color: #f0f0f0;
   }
 
   .post-header {
@@ -171,9 +176,6 @@
     margin-top: 10px;
     font-size: 14px;
     overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;      /* Limits the text to 3 lines */
-    -webkit-box-orient: vertical;
     line-height: 1.5;
     font-family: 'Inter', sans-serif;
     color: #333;
@@ -236,21 +238,25 @@
 }
   
   #menu-icon {
-  position: absolute;
-  top: 15px;
-  left: 10px;
-  border-radius: 50%;
-  
-  background-color: #fff;
-  cursor: pointer;
-  padding: 5px;
-  transition: left 0.3s ease;
-  z-index: 11;
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    border-radius: 50%;
+    
+    background-color: #fff;
+    cursor: pointer;
+    padding: 5px;
+    transition: left 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 11;
+    height: 1em;
+    width: 1em;
+    font-size: 30px;
 }
 
 /* When sidebar opens, move the menu icon right */
 .sidebar.active ~ div nav #menu-icon {
   left: 230px; /* sidebar width + gap */
+  transform: rotate(90deg);
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
@@ -345,25 +351,61 @@ li:hover {
   }
 
   .post-image{
-  /* Spacing: Adds margin to separate the image from the text/tail. */
-  margin-top: 10px; /* Space above image */
-  margin-bottom: 5px; /* Space below image */
+    /* Spacing: Adds margin to separate the image from the text/tail. */
+    margin-top: 10px; /* Space above image */
+    margin-bottom: 5px; /* Space below image */
 
-  /* Dimensions & Fit: Keeps image responsive but prevents excessive size. */
-  width: 100%;
-  height: auto;
-  max-height: 500px; 
-  
-  /* Visual: Ensures clean edges and a subtle shadow. */
-  border: 1px solid #e0e0e0; /* Add a very light border for definition */
-  outline: 0;
-  border-radius: 12px; /* Slightly less aggressive border radius than 18px */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
-  
-  /* Positioning: Controls how the image content fills the container. */
-  object-fit: cover;
-  object-position: center;
-}
+    /* Dimensions & Fit: Keeps image responsive but prevents excessive size. */
+    width: 100%;
+    height: auto;
+    max-height: 500px; 
+    
+    /* Visual: Ensures clean edges and a subtle shadow. */
+    border: 1px solid #e0e0e0; /* Add a very light border for definition */
+    outline: 0;
+    border-radius: 12px; /* Slightly less aggressive border radius than 18px */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+    
+    /* Positioning: Controls how the image content fills the container. */
+    object-fit: cover;
+    object-position: center;
+  }
+  .sidebar-notlogin{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .sidebar-notlogin button{
+    padding: 10px 20px;
+    background-color: #1e90ff;
+    border: none;
+    font-weight: 500;
+    color: white;
+    outline: none;
+    border-radius: 10px;
+  }
+
+  .sidebar-notlogin button:hover{
+    opacity: 0.9;
+    background-color: #0A84FF;
+    transform: scale(1.03);
+  }
+
+  .sidebar-notlogin button:active{
+    background-color: #0066cc;
+    transform: scale(0.97);
+  }
+
+  .placeholder{
+    display: none;
+  }
+
+
 
   /* Laptop and up (1024px+) */
 @media (min-width: 1024px) {
@@ -373,7 +415,9 @@ li:hover {
   */
   body {
     display: grid;
-    grid-template-columns: 220px 1fr; /* Sidebar fixed width, main content fills */
+    height: 100vh; /* Full viewport height */
+    overflow: hidden;
+    grid-template-columns: 220px 1fr 300px; /* Sidebar fixed width, main content fills */
     width: 100%; /* Limit overall width for aesthetics */
     margin: 0 auto; /* Center the layout on the screen */
   }
@@ -399,10 +443,31 @@ li:hover {
   div { /* This targets the <div> containing the nav, posts, etc. */
     padding: 0;
   }
-  .post-home {
-    max-width: 700px; /* Limit width for readability */
+
+  .post-home{
+    height: 100vh;
+    max-width: 700px;
+    position: relative;
     overflow-y: auto;
   }
+
+.placeholder {
+  display: flex; /* override display:none */
+  position: fixed;
+  right: 0px;
+  top: 0px;
+  padding: 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  text-align: center;
+  width: 240px;
+  background-color: #0066cc;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  z-index: 111;
+}
+
 
   /* 4. HIDE MOBILE MENU: The menu icon is no longer needed on PC.
   */
@@ -472,16 +537,25 @@ li:hover {
       </div>
       <section class="post-section">
       </section>
+      <div style="height: 50px; width: 100%;"></div>
     </div>
+    <div class="placeholder">Nothing to see here..</div>
   </div>
   <script>
-        const postDiv = document.querySelector('.post-section')
+    const logIn = function(){
+        window.location.href = "login.html"
+      }
+    const postDiv = document.querySelector('.post-section')
     const token = localStorage.getItem('token')
     const sidebar = document.querySelector('.sidebar')
     const menu = document.getElementById('menu-icon')
     menu.addEventListener('click', (e) => {
       sidebar.classList.toggle("active")
-    })
+      if (sidebar.classList.contains("active")){
+        menu.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />`
+    }else{
+      menu.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25" />`
+    }})
     const postBtn = document.querySelector("#post-btn")
     postBtn.addEventListener('click', (e) => {
       if (token){
@@ -620,7 +694,7 @@ const response = await fetch("http://localhost:2345/api/posts", {
     }else{
       sidebar.innerHTML = `<div class="sidebar-notlogin">
       <img src="../images/Loginimage.png" alt="."/>
-      <button class="login">Click here to login</button>
+      <button class="login", onclick=logIn()>Click here to login</button>
       </div>`
     }
     data.reverse().forEach((posts) => {
@@ -629,7 +703,7 @@ const response = await fetch("http://localhost:2345/api/posts", {
         <div class="seperator"></div>
         <div class="post-header">
           <div class="post-profile">
-            <img src="../images/profile1.webp" alt="." />
+            <img src=${posts.profilePic || "../images/profile1.webp"} alt="." />
             <div class="post-text">
               <span>${posts.fullname}</span>
               <span>${posts.username}</span>
@@ -641,27 +715,37 @@ const response = await fetch("http://localhost:2345/api/posts", {
 
 
         </div>
-        <span class="content">${posts.content}</span>
-        ${posts.imageUrl ? `<img class="post-image" src="${posts.imageUrl}" alt="image"/>` : ""}
-        <div class="post-tail">
-          <svg
-          id="like-btn"
-          fill="${posts.isLiked ? 'red' : 'none'}"
-          xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" 
-              stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-              </svg>
-          <span class="likes">${posts.likes}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <div class="post-content">
+          <span class="content">${posts.content}</span>
+          ${posts.imageUrl ? `<img class="post-image" src="${posts.imageUrl}" alt="image"/>` : ""}
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="post-tail">
+            <svg
+            id="like-btn"
+            fill="${posts.isLiked ? 'red' : 'none'}"
+            xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" 
+                stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                </svg>
+            <span class="likes">${posts.likes}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
-              </svg>
-          <span class="comments">${posts.comments.length}</span>
-
-             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
-</svg>
-
-              <span class="shares">0</span>
+            </svg>
+            <span class="comments">${posts.comments.length}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
+            </svg>
+            <span class="shares">0</span>
+          </div>
+          <div style="display: flex; gap: 10px; font-size: 40px; width: 1em;  margin-top: 10px; height: 1em;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+            </svg>
+          </div>
         </div>
       </div>
       `

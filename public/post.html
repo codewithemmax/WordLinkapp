@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html langs"en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
@@ -15,7 +15,7 @@
     --text-muted: #64748b;
     --border: rgba(15,23,42,0.08);
     --glow: rgba(10,132,255,0.15);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;background:var(--bg);color:var(--text)}
@@ -65,6 +65,7 @@
   .avatar:hover{
     transform:translateY(-2px);
   }
+
   
   .header-content{
     flex:1;
@@ -86,8 +87,6 @@
     width:40px;
     height:40px;
     border-radius:12px;
-    background:var(--muted);
-    border:1px solid var(--border);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -254,7 +253,7 @@
   }
   
   .image-zone:hover .plus{
-    transform:rotate(90deg) scale(1.1);
+    transform:scale(1.2);
   }
   
   .add-text{
@@ -418,7 +417,6 @@
     cursor:pointer;
     transition:all 0.2s;
   }
-  
   .icon:hover{
     border-color:var(--accent);
     transform:translateY(-2px);
@@ -510,15 +508,12 @@
           <div class="header-subtitle">Share your thoughts</div>
         </div>
         <div class="menu-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/>
-          </svg>
         </div>
       </div>
 
       <div class="content">
         <div class="title">What's on your mind?</div>
-        <textarea id="autoExpand" placeholder="Share something amazing..." oninput="autoResize(this)"></textarea>
+        <textarea id="autoExpand" placeholder="What's happening.." oninput="autoResize(this)"></textarea>
 
         <div class="image-zone">
           <input type="file" accept="image/*,video/*" class="file-input active" id="fileInput" onchange="handleFileSelect(event)">

@@ -79,6 +79,7 @@ export const createPost = async (req, res) => {
       username: req.user.username, // comes from the decoded token
       content: text,
       imageUrl: imageUrl,
+      profilePic: req.user.profilePic,
       fullname: req.user.fullname,
       createdAt: new Date(),
       likes: 0,

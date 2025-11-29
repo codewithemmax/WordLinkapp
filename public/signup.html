@@ -524,40 +524,27 @@
         const skipBtn = document.getElementById("skipBtn");
         const formImage = new FormData()
         formImage.append("image", formData.profilePic)
+        formImage.append("username", formData.username)
+        formImage.append("firstname", formData.firstname)
+        formImage.append("lastname", formData.lastname)
+        formImage.append("email", formData.email)
+        formImage.append("password", formData.password)
+
 
         try {
           loader.style.display = "flex";
           submitBtn.disabled = true;
           skipBtn.disabled = true;
           msg.innerText = "";
-          if(formData.profilePic){
-            const resImage = await fetch("http://localhost:2345/api/auths/signup", {
-            method: "POST",
-            body: formImage})
-          }
-          
-
           const res = await fetch("http://localhost:2345/api/auths/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              username: formData.username,
-              firstname: formData.firstname,
-              lastname: formData.lastname,
-              email: formData.email,
-              profilePic: formData.profilePic,
-              password: formData.password,
-            }),
-          });
-
+          method: "POST",
+          body: formImage})
           const data = await res.json();
           msg.style.color = res.ok ? "green" : "red";
           msg.innerText = res.ok ? data.message : `${data.message}`;
 
           if (res.ok) {
-            setTimeout(() => {
-              window.location.href = "login.html";
-            }, 1000);
+            window.location.href = "login.html";
           } else {
             loader.style.display = "none";
             submitBtn.disabled = false;

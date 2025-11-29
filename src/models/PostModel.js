@@ -7,6 +7,7 @@ const postSchema = new mongoose.Schema({
   imageUrl: String,
   createdAt: Date,
   isLiked: Boolean,
+  profilePic: String,
   likes: { type: Number, default: 0 },
   likedBy: { type: [mongoose.Schema.Types.ObjectId], ref: "User", default: [] },
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
