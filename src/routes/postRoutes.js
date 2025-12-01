@@ -20,7 +20,7 @@ router.get("/", optionalAuthenticateToken, getPosts);
 router.post("/", authenticateToken, upload.single('image'), createPost);
 router.get("/:id", getPost);
 router.put("/:id", updatePost);
-router.delete("/:id", deletePost);
+router.delete("/:id", authenticateToken, deletePost);
 router.post("/:id/like", authenticateToken, likePost);
 router.post("/:id/comment", authenticateToken, commentPost);
 

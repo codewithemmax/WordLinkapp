@@ -25,7 +25,6 @@ export const createPost = async (req, res) => {
     
     // Upload to Cloudinary if image exists
     if (imageFile) {
-      console.log('Uploading to Cloudinary...');
       const uploadWithTimeout = (filePath, timeoutMs = 60000) => {
         return new Promise((resolve, reject) => {
           const uploadPromise = cloudinary.uploader.upload(filePath, { folder: "wordlink_posts" });
@@ -49,7 +48,6 @@ export const createPost = async (req, res) => {
           try {
             const result = await uploadWithTimeout(imageFile.path, 60000); // 60s per attempt
             imageUrl = result.secure_url;
-            console.log('Upload successful:', imageUrl, 'attempt', attempt);
             break;
           } catch (err) {
             lastError = err;
@@ -78,6 +76,7 @@ export const createPost = async (req, res) => {
     const newPost = new Post({
       username: req.user.username, // comes from the decoded token
       content: text,
+      userId: req.user.id,
       imageUrl: imageUrl,
       profilePic: req.user.profilePic,
       fullname: req.user.fullname,
@@ -111,16 +110,14 @@ export const getPosts = async (req, res) => {
       likes: post.likes,
       comments: post.comments,
       createdAt: post.createdAt,
+      isUserPost: post.userId ? post.userId.toString() === userId : false,
+      profilePic: post.profilePic,
       isLiked: userId ? post.likedBy.includes(userId) : false // 👈 key part
     }));
 
     return res.json(formatted);
-    if (userId){
-    	console.log(post.likedBy)
-    	console.log(userId)
-    }
   } catch (err) {
-    return res.status(500).json({ message: "Error fetching posts" });
+    return res.status(500).json({ message: `Error fetching posts: ${err}` });
   }
 };
 // Like a post
@@ -185,6 +182,7 @@ export const getPost = async (req, res) => {
 export const deletePost = async (req, res) => {
   await Post.findByIdAndDelete(req.params.id);
   res.json({ message: "Post deleted" });
+  console.log("Post deleted");
 };
 
 // Update post

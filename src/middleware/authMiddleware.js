@@ -5,7 +5,6 @@ export function authenticateToken(req, res, next) {
   const token = authHeader && authHeader.split(" ")[1]; // get token after "Bearer"
 
   if (!token){
-    console.log("No token")
     return res
       .status(401)
       .json({ message: "Access denied. No token provided." });
@@ -18,7 +17,6 @@ export function authenticateToken(req, res, next) {
 }
 
 export function optionalAuthenticateToken(req, res, next) {
-      console.log("Get auth")
 	  const authHeader = req.headers["authorization"];
 	    const token = authHeader && authHeader.split(" ")[1];
 
