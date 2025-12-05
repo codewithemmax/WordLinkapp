@@ -8,513 +8,665 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>WordLink</title>
     <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;700&family=Poppins:wght@500;600&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;700&family=Poppins:wght@500;600&display=swap');
 
-  body {
-    font-family: 'Inter', sans-serif;
-    user-select: none;
-    margin: 0;
-    overflow-y: auto;
-    padding: 0;
-    background-color: white
-  }
+      :root{
+        --bg: #ffffff;
+        --muted: #f1f5f9;
+        --accent: #0A84FF;
+        --accent-hover: #0070e0;
+        --text: #0f172a;
+        --text-muted: #64748b;
+        --border: rgba(15,23,42,0.08);
+        --glow: rgba(10,132,255,0.15);
+        font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      }
+      
+      body {
+        font-family: 'Inter', sans-serif;
+        user-select: none;
+        margin: 0;
+        overflow-y: auto;
+        padding: 0;
+        background-color: white
+      }
 
-  nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0px;
-    height: 50px;
-    padding: 10px 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  }
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0px;
+        height: 50px;
+        z-index: 1000;
+        padding: 10px 20px;
+        background-color: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      }
 
-  svg {
-    width: 30px;
-    height: 30px;
-    font-weight: bold;
-  }
+      svg {
+        width: 30px;
+        height: 30px;
+        font-weight: bold;
+      }
 
-  #post-icon {
-    color: #4169e1;
-  }
+      #post-icon {
+        color: #4169e1;
+      }
 
-  p {
-    font-weight: 400;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: #333;
-    margin: 10px 0;
-  }
+      p {
+        font-weight: 400;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        color: #333;
+        margin: 10px 0;
+      }
 
-  .home-title {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 22px;
-    margin: 15px 20px;
-  }
+      .home-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 22px;
+        margin: 15px 20px;
+      }
 
-  .post-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    padding: 0 20px;
-  }
+      .post-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding: 0 20px;
+      }
 
-  .post-container textarea {
-    border: none;
-    resize: none;
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-    background-color: rgba(135, 206, 250, 0.2);
-    outline: none;
-    border-radius: 5px;
-    box-sizing: border-box;
-    padding: 15px 10px;
-  }
+      .post-container textarea {
+        border: none;
+        resize: none;
+        font-size: 14px;
+        font-family: 'Inter', sans-serif;
+        background-color: rgba(135, 206, 250, 0.2);
+        outline: none;
+        border-radius: 5px;
+        box-sizing: border-box;
+        padding: 15px 10px;
+      }
 
-  .post-container textarea:hover {
-    outline: 2px solid #000;
-  }
-  
-  .home-title2{
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    align-items: center;
-  }
-  
-  .home-title2 img{
-    max-width: 90px;
-    margin-left: 25px;
-  }
+      .post-container textarea:hover {
+        outline: 2px solid #000;
+      }
+      
+      .home-title2{
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: center;
+      }
+      
+      .home-title2 img{
+        max-width: 90px;
+        margin-left: 25px;
+      }
 
-  .post-container button {
-    width: 70px;
-    text-align: center;
-    color: white;
-    
-    border: none;
-    background: linear-gradient(90deg, #6a5acd, #4169e1);
-    padding: 7px 10px;
-    border-radius: 6px;
-    align-self: flex-end;
-    cursor: pointer;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    transition: 0.3s ease;
-  }
+      .post-container button {
+        width: 70px;
+        text-align: center;
+        color: white;
+        
+        border: none;
+        background: linear-gradient(90deg, #6a5acd, #4169e1);
+        padding: 7px 10px;
+        border-radius: 6px;
+        align-self: flex-end;
+        cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        transition: 0.3s ease;
+      }
 
-  .post-container button:hover {
-    opacity: 0.9;
-    transform: scale(1.03);
-  }
+      .post-container button:hover {
+        opacity: 0.9;
+        transform: scale(1.03);
+      }
 
-  .post-container button:active {
-    background: linear-gradient(90deg, #483d8b, #1e90ff);
-    transform: scale(0.97);
-  }
+      .post-container button:active {
+        background: linear-gradient(90deg, #483d8b, #1e90ff);
+        transform: scale(0.97);
+      }
 
-  .seperator {
-    height: 1px;
-    width: 100%;
-    background-color: #e0e0e0;
-    margin: 10px 5px;
-  }
+      .seperator {
+        height: 1px;
+        width: 100%;
+        background-color: #e0e0e0;
+        margin: 10px 5px;
+      }
 
-  .post-card {
-    margin-top: 5px;
-    display: flex;
-    flex-direction: column;
-    padding: 5px 15px;
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
-  }
+      .post-section {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
 
-  .post-content:active{
-    background-color: #f0f0f0;
-  }
+      .post-card {
+        margin-top: 5px;
+        display: flex;
+        flex-direction: column;
+        padding: 5px 15px;
+        border-radius: 8px;
+        font-family: 'Inter', sans-serif;
+      }
 
-  .post-header {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: space-between;
-  }
+      .post-card:active {
+        background-color: #f0f0f0;
+        transition: background 0.15s;
+      }
 
-  .post-profile {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
+      .post-date{
+        font-size: 12px;
+        color: grey;
+        text-align: right;
+        margin-top: 5px;
+      }
 
-  .post-profile img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-  }
+      .post-content{
+         display: -webkit-box;        /* Needed for line clamping */
+        -webkit-line-clamp: 3;       /* Number of lines to show */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
-  .post-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-size: 13px;
-  }
-
-  .post-text span:first-of-type {
-    font-weight: 600;
-    font-family: 'Montserrat', sans-serif;
-  }
-
-  .post-text span:last-of-type {
-    color: grey;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .content {
-    margin-top: 10px;
-    font-size: 14px;
-    overflow: hidden;
-    line-height: 1.5;
-    font-family: 'Inter', sans-serif;
-    color: #333;
-  }
-
-  img {
-    box-sizing: border-box;
-    max-width: 100%;
-  }
-
-  svg {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    transition: transform 0.1s ease;
-  }
-
-  svg:active {
-    transform: scale(0.9);
-  }
-
-  .post-tail {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    margin-top: 10px;
-  }
-
-  .post-tail svg {
-    font-size: 20px;
-    width: 1em;
-    height: 1em;
-  }
-
-  .post-tail span {
-    font-size: 12px;
-    font-family: 'Inter', sans-serif;
-  }
-  
-  .post-tail span:not(:last-child) {
-  margin-right: 8px; /* adds spacing between spans except the last one */
-}
-
-  .sidebar {
-  display: flex;
-  flex-direction: column;/* align items to the left */
-  justify-content: flex-start;
-  padding: 20px 0; /* add a bit of vertical spacing */
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 220px;
-  height: 100%;
-  background-color: #fff;
-  z-index: 10;
-  transition: transform 0.3s ease;
-  transform: translateX(-100%);
-  overflow-y: auto; /* ensures long lists can scroll */
-}
-  
-  #menu-icon {
-    position: absolute;
-    top: 15px;
-    left: 10px;
-    border-radius: 50%;
-    
-    background-color: #fff;
-    cursor: pointer;
-    padding: 5px;
-    transition: left 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-    z-index: 11;
-    height: 1em;
-    width: 1em;
-    font-size: 30px;
-}
-
-/* When sidebar opens, move the menu icon right */
-.sidebar.active ~ div nav #menu-icon {
-  left: 230px; /* sidebar width + gap */
-  transform: rotate(90deg);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-  .sidebar.active {
-    transform: translateX(0);
-  }
-  
-  .sidebar-profile{
-    padding: 10px 20px;
-  }
-  
-  .sidebar ul {
-    list-style-type: none;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding: 0;
-    margin: 0;
-}
-
-    .sidebar li {
-      font-size: 15px;
-      width: 100%;
-      padding: 20px 25px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      transition: background 0.2s ease;
+      .post-card:active:not(:has(button:active, svg:active, span:active)) {
+        background-color: #dcdcdc;
     }
 
-li:hover {
-  background-color: #f0f0f0;
-}
-  
-  .sidebar-profile img{
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    margin-bottom: 10px;
-  }
+      .post-header {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+      }
 
-  .dropdown {
-    position: relative;
-    display: inline-block;
-    width: fit-content;
-  }
-  
-  li svg{
-    height: 1em;
-    width: 1em;
-    font-size: 15px;
-  }
-  
-  .sidebar-profile p{
-    font-size: 16px;
-    border: 5px;
-  }
-  
-  .readmore{
-    border: 0;
-    font-size: 15px;
-    outline: 0;
-    padding: 2px;
-  }
-  
-  .sidebar-profile p:first-of-type {
-    font-weight: 600;
-    white-space: nowrap;      /* Prevents the text from wrapping to a new line */
-    overflow: hidden;         /* Hides the overflowing text */
-    text-overflow: ellipsis;  /* Displays the ellipsis (...) for the clipped text */
-    max-width: 200px;  
-    font-family: 'Montserrat', sans-serif;
-  }
+      .post-profile:active{
+        background-color: #dcdcdc;
+      }
 
-  .sidebar-profile p:last-of-type {
-    color: grey;
-    white-space: nowrap;      /* Prevents the text from wrapping to a new line */
-    overflow: hidden;         /* Hides the overflowing text */
-    text-overflow: ellipsis;  /* Displays the ellipsis (...) for the clipped text */
-    max-width: 200px;  
-    font-family: 'Inter', sans-serif;
-  }
+      .post-profile {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
 
-  .dropdown-toggle {
-  cursor: pointer;
-}
+      .post-profile img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+
+      .post-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: 13px;
+      }
+
+      .post-text span:first-of-type {
+        font-weight: 600;
+        font-family: 'Montserrat', sans-serif;
+      }
+
+      .post-text span:last-of-type {
+        color: grey;
+        font-family: 'Inter', sans-serif;
+      }
+
+      .content {
+        margin-top: 20px;
+        font-size: 14px;
+        overflow: hidden;
+        line-height: 1.5;
+        font-family: 'Inter', sans-serif;
+        color: #333;
+      }
+
+      img {
+        box-sizing: border-box;
+        max-width: 100%;
+      }
+
+      svg {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.1s ease;
+      }
+
+      svg:active {
+        transform: scale(0.9);
+      }
+
+      .post-tail {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        margin-top: 10px;
+      }
+
+      .post-tail svg {
+        font-size: 20px;
+        width: 1em;
+        height: 1em;
+      }
+
+      .post-tail span {
+        font-size: 12px;
+        font-family: 'Inter', sans-serif;
+      }
+      
+      .post-tail span:not(:last-child) {
+      margin-right: 8px; /* adds spacing between spans except the last one */
+    }
+
+      .sidebar {
+      display: flex;
+      flex-direction: column;/* align items to the left */
+      justify-content: flex-start;
+      padding: 20px 0; /* add a bit of vertical spacing */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background-color: #fff;
+      z-index: 10;
+      transition: transform 0.3s ease;
+      transform: translateX(-100%);
+      overflow-y: auto; /* ensures long lists can scroll */
+    }
+      
+      #menu-icon {
+        position: absolute;
+        top: 5px;
+        left: 10px;
+        border-radius: 50%;
+        background-color: #fff;
+        cursor: pointer;
+        padding: 5px;
+        transition: left 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        z-index: 11;
+        height: 1em;
+        width: 1em;
+        font-size: 40px;
+    }
+
+    /* When sidebar opens, move the menu icon right */
+    .sidebar.active ~ div nav #menu-icon {
+      left: 230px; /* sidebar width + gap */
+      transform: rotate(90deg);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .sidebar-profile{
+        padding: 10px 20px;
+      }
+      
+      .sidebar ul {
+        list-style-type: none;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+
+      .sidebar li {
+        font-size: 15px;
+        width: 100%;
+        padding: 20px 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      li:hover {
+        background-color: #f0f0f0;
+      }
+      
+      .sidebar-profile img{
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+      }
+
+      .dropdown {
+        position: relative;
+        display: inline-block;
+        width: fit-content;
+      }
+      
+      li svg{
+        height: 1em;
+        width: 1em;
+        font-size: 15px;
+      }
+      
+      .sidebar-profile p{
+        font-size: 16px;
+        border: 5px;
+      }
+      
+      .readmore{
+        border: 0;
+        font-size: 15px;
+        outline: 0;
+        text-decoration: underline;
+        background: none;
+        color: #0A84FF;
+        padding: 2px;
+      }
+      
+      .sidebar-profile p:first-of-type {
+        font-weight: 600;
+        white-space: nowrap;      /* Prevents the text from wrapping to a new line */
+        overflow: hidden;         /* Hides the overflowing text */
+        text-overflow: ellipsis;  /* Displays the ellipsis (...) for the clipped text */
+        max-width: 200px;  
+        font-family: 'Montserrat', sans-serif;
+      }
+
+      .sidebar-profile p:last-of-type {
+        color: grey;
+        white-space: nowrap;      /* Prevents the text from wrapping to a new line */
+        overflow: hidden;         /* Hides the overflowing text */
+        text-overflow: ellipsis;  /* Displays the ellipsis (...) for the clipped text */
+        max-width: 200px;  
+        font-family: 'Inter', sans-serif;
+      }
+
+      .dropdown-toggle {
+      cursor: pointer;
+    }
 
 
-  
-  .follow{
-    display: flex;
-    font-weight: 500;
-    padding: 10px 0;
-    font-size: 13px;
-    font-family: 'Inter', sans-serif;
-    gap: 10px;
-  }
-  
-  .follows{
-    display: flex;
-    flex-direction: column;
-  }
+      
+      .follow{
+        display: flex;
+        font-weight: 500;
+        padding: 10px 0;
+        font-size: 13px;
+        gap: 10px;
+      }
+      
+      .follows{
+        display: flex;
+        width: fit-content;
+        justify-content: center;
+        color: #333;
+        font-family: 'Montserrat', sans-serif;
+        flex-direction: column;
+      }
 
-  .post-image{
-    /* Spacing: Adds margin to separate the image from the text/tail. */
-    margin-top: 10px; /* Space above image */
-    margin-bottom: 5px; /* Space below image */
+      .follows span:last-of-type{
+        align-self: center;
 
-    /* Dimensions & Fit: Keeps image responsive but prevents excessive size. */
-    width: 100%;
-    height: auto;
-    max-height: 500px; 
-    
-    /* Visual: Ensures clean edges and a subtle shadow. */
-    border: 1px solid #e0e0e0; /* Add a very light border for definition */
-    outline: 0;
-    border-radius: 12px; /* Slightly less aggressive border radius than 18px */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
-    
-    /* Positioning: Controls how the image content fills the container. */
-    object-fit: cover;
-    object-position: center;
-  }
-  .sidebar-notlogin{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    gap: 15px;
-    padding: 20px;
-  }
+      }
 
-  .sidebar-notlogin button{
-    padding: 10px 20px;
-    background-color: #1e90ff;
-    border: none;
-    font-weight: 500;
-    color: white;
-    outline: none;
-    border-radius: 10px;
-  }
+      .post-image{
+        /* Spacing: Adds margin to separate the image from the text/tail. */
+        margin-top: 10px; /* Space above image */
+        margin-bottom: 5px; /* Space below image */
 
-  .sidebar-notlogin button:hover{
-    opacity: 0.9;
-    background-color: #0A84FF;
-    transform: scale(1.03);
-  }
+        /* Dimensions & Fit: Keeps image responsive but prevents excessive size. */
+        width: 100%;
+        height: auto;
+        max-height: 500px; 
+        
+        /* Visual: Ensures clean edges and a subtle shadow. */
+        border: 1px solid #e0e0e0; /* Add a very light border for definition */
+        outline: 0;
+        border-radius: 12px; /* Slightly less aggressive border radius than 18px */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+        
+        /* Positioning: Controls how the image content fills the container. */
+        object-fit: cover;
+        object-position: center;
+      }
+      .sidebar-notlogin{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        gap: 15px;
+        padding: 20px;
+      }
 
-  .sidebar-notlogin button:active{
-    background-color: #0066cc;
-    transform: scale(0.97);
-  }
+      .sidebar-notlogin button{
+        padding: 10px 20px;
+        background-color: #1e90ff;
+        border: none;
+        font-weight: 500;
+        color: white;
+        outline: none;
+        border-radius: 10px;
+      }
 
-  .placeholder{
-    display: none;
-  }
+      .sidebar-notlogin button:hover{
+        opacity: 0.9;
+        background-color: #0A84FF;
+        transform: scale(1.03);
+      }
 
-  .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    font-size: 14px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    border-radius: 5px;
-    overflow: hidden;
-    z-index: 100;
-  }
+      .sidebar-notlogin button:active{
+        background-color: #0066cc;
+        transform: scale(0.97);
+      }
 
-  .dropdown-menu li:hover{
-    background-color: #878383;
-  }
-  
+      .placeholder{
+        display: none;
+      }
 
-  /* Laptop and up (1024px) */
-@media (min-width: 1024px) {
-  /* 1. MAIN LAYOUT: Set up the body to use CSS Grid for a 2-column layout.
-     The first column is the sidebar (220px), the second is the main content.
-     We center the whole layout in the screen using a max-width on the body.
-  */
-  body {
-    display: grid;
-    height: 100vh; /* Full viewport height */
-    overflow: hidden;
-    grid-template-columns: 220px 1fr 300px; /* Sidebar fixed width, main content fills */
-    width: 100%; /* Limit overall width for aesthetics */
-    margin: 0 auto; /* Center the layout on the screen */
-  }
+      .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        font-size: 14px;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border-radius: 5px;
+        overflow: hidden;
+        z-index: 100;
+      }
 
-  /* 2. SIDEBAR: Make it permanently visible and fixed.
-     We need to remove the mobile-style `position: fixed` or `transform` 
-     and make it part of the main grid flow.
-  */
-  .sidebar {
-    position: sticky; /* Keep it visible while scrolling the main content */
-    top: 0;
-    height: 100vh; /* Make it full height */
-    transform: translateX(0); /* Ensure it's always visible */
-    z-index: 10;
-    overflow-x: hidden;
-    left: 0;
-    border-right: 1px solid #e0e0e0; /* Visual separation from content */
-  }
+      .dropdown-menu li:hover{
+        background-color: #878383;
+      }
 
-  /* 3. MAIN CONTENT: Center the main content area (the div containing nav/posts) 
-     and adjust its padding. 
-  */
-  div { /* This targets the <div> containing the nav, posts, etc. */
-    padding: 0;
-  }
+      .custom-box-overlay{
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(4px);
+        display:none;
+        align-items:center;
+        justify-content:center;
+        z-index: 10000;
+        animation:fadeIn 0.2s ease;
+      }
+      
+      .custom-box-overlay.show{
+        display:flex;
+      }
+      
+      @keyframes fadeIn{
+        from{opacity:0}
+        to{opacity:1}
+      }
+      
+      .custom-box{
+        background:var(--bg);
+        border-radius:20px;
+        padding:28px;
+        max-width:400px;
+        width:90%;
+        box-shadow:0 20px 60px rgba(0,0,0,0.3);
+        animation:slideUp 0.3s ease;
+      }
+      
+      @keyframes slideUp{
+        from{transform:translateY(20px);opacity:0}
+        to{transform:translateY(0);opacity:1}
+      }
+      
+      .custom-box-title{
+        font-size:18px;
+        font-weight:700;
+        color:var(--text);
+        margin-bottom:12px;
+      }
+      
+      .custom-box-message{
+        font-size:14px;
+        color:var(--text-muted);
+        margin-bottom:24px;
+        line-height:1.6;
+      }
+      
+      .custom-box-actions{
+        display:flex;
+        gap:12px;
+      }
+      
+      .custom-box-btn{
+        flex:1;
+        padding:12px 20px;
+        border-radius:12px;
+        font-weight:600;
+        font-size:14px;
+        cursor:pointer;
+        transition:all 0.2s;
+        border:none;
+      }
+      
+      .custom-box-btn.cancel{
+        background:var(--muted);
+        color:var(--text);
+      }
+      
+      .custom-box-btn.cancel:hover{
+        background:#e2e8f0;
+      }
+      
+      .custom-box-btn.confirm{
+        background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color:#fff;
+        box-shadow:0 8px 20px rgba(239,68,68,0.25);
+      }
+      
+      .custom-box-btn.confirm:hover{
+        transform:translateY(-2px);
+        box-shadow:0 12px 28px rgba(239,68,68,0.35);
+      }
 
-  .post-home{
-    height: 100vh;
-    max-width: 700px;
-    position: relative;
-    overflow-y: auto;
-  }
+      
 
-.placeholder {
-  display: flex; /* override display:none */
-  position: fixed;
-  right: 0px;
-  color: grey;
-  background-color: white;
-  border-left: 1px solid #e0e0e0;
-  top: 0px;
-  padding: 20px;
-  font-size: 15px;
-  text-align: center;
-  width: 250px;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-  z-index: 111;
-}
+      /* Laptop and up (1024px) */
+    @media (min-width: 1024px) {
+      /* 1. MAIN LAYOUT: Set up the body to use CSS Grid for a 2-column layout.
+        The first column is the sidebar (220px), the second is the main content.
+        We center the whole layout in the screen using a max-width on the body.
+      */
+      body {
+        display: grid;
+        overflow: hidden;
+        grid-template-columns: 220px 1fr 220px; /* Sidebar fixed width, main content fills */
+        width: 100%; /* Limit overall width for aesthetics */
+      }
+
+      /* 2. SIDEBAR: Make it permanently visible and fixed.
+        We need to remove the mobile-style `position: fixed` or `transform` 
+        and make it part of the main grid flow.
+      */
+
+      body > div {
+          display: flex;
+          flex-direction: column;
+          height: 100vh; /* full column height */
+          overflow: hidden; /* prevent overall overflow */
+        }
+      .sidebar {
+        position: sticky; /* Keep it visible while scrolling the main content */
+        top: 0;
+        height: 100vh; /* Make it full height */
+        transform: translateX(0); /* Ensure it's always visible */
+        z-index: 10;
+        overflow-x: hidden;
+        left: 0;
+        border-right: 1px solid #e0e0e0; /* Visual separation from content */
+      }
+
+      /* 3. MAIN CONTENT: Center the main content area (the div containing nav/posts) 
+        and adjust its padding. 
+      */
+      div { /* This targets the <div> containing the nav, posts, etc. */
+        padding: 0;
+      }
+
+      .post-home{
+        height: 100vh;
+        flex: 1; /* take remaining vertical space */
+        padding: 0 20px;
+        margin: 0 auto;
+        position: relative;
+        max-width: 800px;
+        overflow-y: auto;
+      }
+
+    .placeholder {
+      display: flex; /* override display:none */
+      position: fixed;
+      right: 0px;
+      color: grey;
+      background-color: white;
+      border-left: 1px solid #e0e0e0;
+      top: 0px;
+      font-size: 15px;
+      text-align: center;
+      width: 280px;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      z-index: 111;
+    }
 
 
-  /* 4. HIDE MOBILE MENU: The menu icon is no longer needed on PC.
-  */
-  #menu-icon {
-    display: none;
-  }
+      /* 4. HIDE MOBILE MENU: The menu icon is no longer needed on PC.
+      */
+      #menu-icon {
+        display: none;
+      }
 
-  /* 5. NAV BAR: Adjust the navigation to compensate for the removed menu icon space.
-  */
-  nav {
-    padding-left: 20px; 
-    /* The sidebar is now separate, so adjust padding to keep it clean */
-  }
-  
-  .home-title2 {
-    /* Since the menu icon is hidden, we remove its influence on the title */
-    gap: 10px;
-  }
-}
+      /* 5. NAV BAR: Adjust the navigation to compensate for the removed menu icon space.
+      */
+      nav {
+        padding-left: 20px;
+        min-width: 700px;
+            /* The sidebar is now separate, so adjust padding to keep it clean */
+      }
+      
+      .home-title2 {
+        /* Since the menu icon is hidden, we remove its influence on the title */
+        gap: 10px;
+      }
+    }
 
 </style>
   </head>
@@ -522,52 +674,56 @@ li:hover {
     <aside class="sidebar" id="sidebar">
     </aside>
     <div>
-    <nav>
-      <div class="home-title2">
-      <svg
-        id="menu-icon"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="size-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25"
-        />
-      </svg>
-      <img src="../images/icon2.png" alt="."/>
-      </div>
-      
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        id="post-btn"
-        style="color: #0A84FF;"
-        class="size-6"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
-          clip-rule="evenodd"
-        />
-      </svg>
-    </nav>
     <div class="post-home">
-      <p class="home-title">Home</p>
-      <div class="post-container">
-        <textarea id="postContent" placeholder="What's on your mind?"></textarea>
-        <button onclick="createPost()">Post</button>
-      </div>
+      <nav>
+        <div class="home-title2">
+        <svg
+          id="menu-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25"
+          />
+        </svg>
+        <img src="../images/icon2.png" alt="."/>
+        </div>
+        
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          id="post-btn"
+          style="color: #0A84FF;"
+          class="size-6"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </nav>
       <section class="post-section">
       </section>
-      <div style="height: 50px; width: 100%;"></div>
     </div>
     <div class="placeholder">Nothing to see here...</div>
+  </div>
+  <div class="custom-box-overlay" id="deleteModal">
+      <div class="custom-box">
+        <div class="custom-box-title">Delete Post?</div>
+        <div class="custom-box-message">Are you sure you want to delete this post? Your will not be able to retrieve it again.</div>
+        <div class="custom-box-actions">
+          <button class="custom-box-btn cancel" onclick="closedeleteModal()">Cancel</button>
+          <button class="custom-box-btn confirm">Delete</button>
+        </div>
+      </div>
   </div>
   <script>
     const logIn = function(){
@@ -578,23 +734,60 @@ li:hover {
     const sidebar = document.querySelector('.sidebar')
     const menu = document.getElementById('menu-icon')
 
-    async function deletePost(postId) {
-  console.log("Delete post:", postId);
+    function sharePost(postId) {
+      if (navigator.share) {
+        const url = `${window.location.origin}/clients.html?postId=${postId}`
+        navigator.share({
+          title: "WordLink Post",
+          url: url
+        })
+      } else {
+        navigator.clipboard.writeText(url);
+        alert("Link copied: " + url);
+      }
+    }
 
-  const res = await fetch(`http://localhost:2345/api/posts/${postId}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+    document.querySelector('.custom-box-btn.confirm').addEventListener('click', function(){
+      const postId = sessionStorage.getItem("deletePostId");
+      deletePost(postId);
+      closedeleteModal();
+    });
+g
+    const editPost = (postId) => {
+      sessionStorage.setItem("editPostId", postId);
+      window.location.href = "editpost.html";
+    }
 
-  const data = await res.json();
-  console.log("Delete response:", data);
+    function showdeleteModal(postId) {
+      sessionStorage.setItem("deletePostId", postId);
+      document.getElementById('deleteModal').classList.add('show');
+    }
+    
+    function closedeleteModal() {
+      document.getElementById('deleteModal').classList.remove('show');
+    }
+  
+    
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closedeleteModal();
+      }
+    });
 
-  if (res.ok) {
-    document.querySelector(`[data-id="${postId}"]`).remove();
-    alert("Post deleted");
-  } else {
-    alert(data.message || "Delete failed");
-  }
+    const deletePost = async (postId) => {
+
+      const res = await fetch(`http://localhost:2345/api/posts/${postId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        document.querySelector(`[data-id="${postId}"]`).remove();
+      } else {
+        alert(data.message || "Delete failed");
+      }
 }
 
 
@@ -755,7 +948,6 @@ const response = await fetch("http://localhost:2345/api/posts", {
     }
 
     if (data){
-      console.log(data)
       const sortedPosts = data
   .map(post => ({ ...post, score: getPostScore(post) }))
   .sort((a, b) => b.score - a.score); // highest score first
@@ -763,66 +955,73 @@ const response = await fetch("http://localhost:2345/api/posts", {
     sortedPosts.forEach((posts) => {
       postDiv.innerHTML += `
          <div class="post-card" data-id=${posts._id}>
-        <div class="seperator"></div>
-        <div class="post-header">
-          <div class="post-profile">
-            <img src=${posts.profilePic || "../images/profile1.webp"} alt="." />
-            <div class="post-text">
-              <span>${posts.fullname}</span>
-              <span>${posts.username}</span>
+            <div class="seperator"></div>
+            <div class="post-header">
+              <div class="post-profile">
+                <img src=${posts.profilePic || "../images/profile1.webp"} alt="." />
+                <div class="post-text">
+                  <span>${posts.fullname}</span>
+                  <span>${posts.username}</span>
+                </div>
+              </div>
+              <div class="dropdown">
+                <svg class="size-6 dropdown-toggle" - data-bs-toggle="dropdown" aria-expanded="false" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+                </svg>
+                <ul class="dropdown-menu">
+                  
+                  <li><button class="dropdown-item follow-btn" 
+                      data-username="${posts.username}" 
+                      data-following="${posts.isFollowing}">
+                      ${posts.isFollowing ? `Unfollow @${posts.username}` : `Follow @${posts.username}`}
+                    </button>
+                  </li>
+                  ${posts.isUserPost ? `<li><button class="dropdown-item" type="button" onclick="editPost('${posts._id}')">Edit Post</button></li>` : ""}
+                  ${posts.isUserPost ? `<li><button class="dropdown-item" type="button" onclick="showdeleteModal('${posts._id}')">Delete Post</button></li>` : ""}
+                </ul>
+              </div>
+
+
+            </div>
+            <div class="post-content" style={"margin-top: 10px;"}>
+              <span class="content">${posts.content}</span>  
+              ${posts.content.length > 300 ? `<button class="readmore">Read More</button>` : ""}
+              ${posts.imageUrl ? `<img class="post-image" src="${posts.imageUrl}" alt="image"/>` : ""}
+            </div>
+            ${posts.updatedAt ? `<div class="post-date">${posts.updatedAt}</div>`: ""}
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div class="post-tail">
+                <svg
+                id="like-btn"
+                fill="${posts.isLiked ? 'red' : 'none'}"
+                xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" 
+                    stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                    </svg>
+                <span class="likes">${posts.likes}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
+                </svg>
+                <span class="comments">${posts.comments.length}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
+                </svg>
+                <span class="shares">0</span>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <svg onclick="sharePost('${posts._id}')"style="font-size: 20px; width: 1em;  margin-top: 10px; height: 1em;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                </svg>
+                <svg style="font-size: 20px; width: 1em;  margin-top: 10px; height: 1em;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                </svg>
+              </div>
             </div>
           </div>
-          <div class="dropdown">
-            <svg class="size-6 dropdown-toggle" - data-bs-toggle="dropdown" aria-expanded="false" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
-            </svg>
-            <ul class="dropdown-menu">
-              
-              <li><button class="dropdown-item" type="button">Unfollow @${posts.username}</button></li>
-              ${posts.isUserPost ? `<li><button class="dropdown-item" type="button">Edit Post</button></li>` : ""}
-              ${posts.isUserPost ? `<li><button class="dropdown-item" type="button" onclick=deletePost(${posts._id})>Delete Post</button></li>` : ""}
-            </ul>
-          </div>
-
-
-        </div>
-        <div class="post-content">
-          <span class="content">${posts.content}</span>
-          ${posts.imageUrl ? `<img class="post-image" src="${posts.imageUrl}" alt="image"/>` : ""}
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div class="post-tail">
-            <svg
-            id="like-btn"
-            fill="${posts.isLiked ? 'red' : 'none'}"
-            xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" 
-                stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                </svg>
-            <span class="likes">${posts.likes}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
-            </svg>
-            <span class="comments">${posts.comments.length}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
-            </svg>
-            <span class="shares">0</span>
-          </div>
-          <div style="display: flex; gap: 10px;">
-            <svg style="font-size: 20px; width: 1em;  margin-top: 10px; height: 1em;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
-            </svg>
-            <svg style="font-size: 20px; width: 1em;  margin-top: 10px; height: 1em;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-            </svg>
-          </div>
-        </div>
-      </div>
       `
     })
     }
-    }
+  }
     loadTimeline()
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

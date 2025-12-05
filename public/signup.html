@@ -133,6 +133,9 @@
 
       .msg {
         text-align: center;
+        align-self: center;
+        width: 100%;
+        font-weight: bold;
         color: red;
         font-size: 12px;
         margin-top: 10px;
@@ -276,7 +279,6 @@
             <input type="password" id="password" placeholder="Password" required />
             <div class="helper-text">Min 8 chars, uppercase, lowercase, number & symbol</div>
             <button type="button" id="nextBtn1">Next</button>
-            <div class="msg" id="msg1"></div>
           </div>
 
           <!-- Page 2: Confirm Password -->
@@ -325,7 +327,7 @@
               <button type="button" class="btn-secondary" id="backBtn3">Back</button>
               <button type="button" id="skipBtn">Skip</button>
             </div>
-            <button type="submit" id="submitBtn">Create Account</button>
+            <button type="submit" id="submitBtn">Verify</button>
             <div id="loader" style="display: none">
               <div class="spinner"></div>
             </div>
@@ -333,6 +335,7 @@
           </div>
         </div>
       </form>
+      <div class="msg" id="msg1"></div>
     </div>
 
     <script>
@@ -352,6 +355,17 @@
         dob: "",
         profilePic: null
       };
+
+      window.onload = () => {
+          const verified = sessionStorage.getItem("isVerified");
+          sessionStorage.removeItem("userEmail");
+
+          if(verified === "true"){
+              // finally submit the signup form to backend
+              submitForm();
+          }
+      };
+
 
       // Navigation functions
       function goToPage(pageNum) {
@@ -396,12 +410,12 @@
             msg.innerText = data.message;
             msg.style.color = "red";
             msg.style.display = "flex";
+            next.disabled = true;
             return 
           }else{
             msg.innerText = ""
+            next.disabled = false;
             return
-           
-
           }
       })
       document.getElementById("nextBtn1").addEventListener("click", () => {
@@ -411,6 +425,15 @@
         const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value;
         const msg = document.getElementById("msg1");
+
+        const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!validEmail.test(email)) {
+          msg.style.color = "red";
+          msg.innerText = "Invalid Email format";
+          return;
+        }
+
 
         if (!firstname || !lastname || !username || !email || !password) {
           msg.style.color = "red";
@@ -463,6 +486,7 @@
         const month = parseInt(document.getElementById("month").value);
         const year = parseInt(document.getElementById("year").value);
         const msg = document.getElementById("msg3");
+        sessionStorage.setItem("isVerified", "false");
 
         if (!day || !month || !year) {
           msg.style.color = "red";
@@ -508,13 +532,28 @@
       
       document.getElementById("skipBtn").addEventListener("click", () => {
         formData.profilePic = null;
-        submitForm();
       });
 
       // Form submission
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        submitForm();
+        if (sessionStorage.getItem("isVerified") === "true"){
+          submitForm();
+        }else{
+          // redirect to verify email page
+          const formImage = new FormData()
+          formImage.append("image", formData.profilePic)
+          formImage.append("username", formData.username)
+          formImage.append("firstname", formData.firstname)
+          formImage.append("lastname", formData.lastname)
+          formImage.append("email", formData.email)
+          formImage.append("password", formData.password)
+          const dataObj = Object.fromEntries(formImage.entries());
+          // Store in localStorage as JSON
+          localStorage.setItem("signupData", JSON.stringify(dataObj));
+          sessionStorage.setItem("userEmail", formData.email);
+          window.location.href = "verifyEmail.html";
+        }
       });
 
       async function submitForm() {
@@ -522,31 +561,35 @@
         const msg = document.getElementById("msg4");
         const submitBtn = document.getElementById("submitBtn");
         const skipBtn = document.getElementById("skipBtn");
-        const formImage = new FormData()
-        formImage.append("image", formData.profilePic)
-        formImage.append("username", formData.username)
-        formImage.append("firstname", formData.firstname)
-        formImage.append("lastname", formData.lastname)
-        formImage.append("email", formData.email)
-        formImage.append("password", formData.password)
-
-
+        const storedData = JSON.parse(localStorage.getItem("signupData"));
+        const newData = new FormData();
+        for (let key in storedData) {
+          newData.append(key, storedData[key]);
+        }
+        if (newData.profilePic) {
+          newData.append("image", newData.profilePic);
+        }
         try {
           loader.style.display = "flex";
           submitBtn.disabled = true;
           skipBtn.disabled = true;
           msg.innerText = "";
+          if (!storedData) {
+            return console.log("No stored data found.");
+          }
           const res = await fetch("http://localhost:2345/api/auths/signup", {
           method: "POST",
-          body: formImage})
+          body: newData})
           const data = await res.json();
           msg.style.color = res.ok ? "green" : "red";
           msg.innerText = res.ok ? data.message : `${data.message}`;
 
           if (res.ok) {
+            localStorage.removeItem("formData");
             window.location.href = "login.html";
           } else {
             loader.style.display = "none";
+            localStorage.removeItem("formData");
             submitBtn.disabled = false;
             skipBtn.disabled = false;
           }
@@ -554,6 +597,7 @@
           loader.style.display = "none";
           msg.style.color = "red";
           msg.innerText = "An error occurred. Please try again.";
+          localStorage.removeItem("formData");
           submitBtn.disabled = false;
           skipBtn.disabled = false;
         }

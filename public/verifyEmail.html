@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify your account | Wordlink</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f5f7fa;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      width: 90%;
+      max-width: 450px;
+      text-align: center;
+      padding: 35px 30px;
+      border-radius: 8px;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      width: 90px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 17px;
+      margin-bottom: 5px;
+      color: #1d1d1d;
+    }
+
+    p {
+      color: #555;
+      margin-bottom: 25px;
+      font-size: 12px;
+    }
+
+    .otp-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .otp-inputs input {
+      width: 42px;
+      height: 48px;
+      text-align: center;
+      font-size: 20px;
+      border: 2px solid #cfd7e3;
+      border-radius: 6px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .otp-inputs input:focus {
+      border-color: #2563eb;
+      box-shadow: 0px 0px 4px rgba(37, 99, 235, 0.4);
+    }
+
+    .verify-btn {
+      width: 100%;
+      background: #2563eb;
+      border: none;
+      color: white;
+      font-size: 17px;
+      border-radius: 6px;
+      padding: 13px 0;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+
+    .verify-btn:hover {
+      background: #1e4fc7;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    }
+
+    .link {
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .link a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    span{
+      font-size: 12px;
+      padding: 20px;
+      height: 100px;
+      text-align: center;
+      font-weight: 500;
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h2>Verify your account</h2>
+    <p>Please enter the 6-digit code sent to your email</p>
+
+    <div class="otp-inputs">
+      <input type="number" maxlength="1">
+      <input type="number" maxlength="1">
+      <input type="number" maxlength="1">
+      <input type="number" maxlength="1">
+      <input type="number" maxlength="1">
+      <input type="number" maxlength="1">
+    </div>
+
+    <a href="#" style="font-size:14px; color:#2563eb;">Resend OTP</a>
+
+    <br><br>
+
+    <button class="verify-btn">Verify</button>
+
+    <div class="link">
+      Entered the wrong email?
+      <a href="signup.html">Back to Signup</a>
+    </div>
+    <span id="timer">Retry in 60s
+    </span>
+  </div>
+  <script>
+    const timer = document.getElementById("timer");
+    function startCountdown() {
+      const btn = document.querySelector('a');
+      
+      let endTime = Date.now() + 60000; 
+      sessionStorage.setItem("otpTimeout", endTime);
+
+      btn.style.pointerEvents = "none";
+      btn.style.opacity = "0.4";
+
+      const interval = setInterval(() => {
+        let remaining = Math.floor((endTime - Date.now()) / 1000);
+        
+        if (remaining <= 0) {
+          clearInterval(interval);
+          sessionStorage.removeItem("otpTimeout");
+          
+          btn.style.pointerEvents = "auto";
+          btn.style.opacity = "1";
+          timer.textContent = "";
+          return;
+        }
+
+        timer.textContent = `Retry in ${remaining}s`;
+      }, 1000);
+    }
+
+    const inputs = document.querySelectorAll('.otp-inputs input');
+    window.onload = async () => {
+        inputs[0].focus();
+        let savedTimeout = sessionStorage.getItem("otpTimeout");
+        const email = sessionStorage.getItem("userEmail")
+        if (!email){
+            window.location.href = "signup.html"
+        }
+        if (savedTimeout && Date.now() < savedTimeout) {
+          startCountdown();
+          return;
+        }
+
+        // send new OTP request
+        startCountdown();
+        try{
+            const res = await fetch("http://localhost:2345/api/auths/send_otp", {
+              method: "POST",
+              headers: {"Content-Type":"application/json"},
+              body: JSON.stringify({
+                  email: sessionStorage.getItem("userEmail")
+              })
+          });
+          const data = await res.json()
+          console.log(data)
+        }catch (err){
+        }
+    }
+
+    inputs.forEach((input, index) => {
+    input.addEventListener('input', () => {
+        if (input.value && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+        }
+    });
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === "Backspace" && !input.value && index > 0) {
+        inputs[index - 1].focus();
+        }
+    });
+    });
+
+    // allow pasting full otp
+    document.querySelector('.otp-inputs').addEventListener('paste', function(e){
+    const data = e.clipboardData.getData('text').trim();
+    if(data.length === 6){
+        inputs.forEach((input, i) => {
+        input.value = data[i];
+        });
+    }
+    });
+
+    // send otp to backend
+    document.querySelector(".verify-btn").addEventListener("click", async () => {
+    let otp = "";
+    inputs.forEach(input => otp += input.value);
+
+    const res = await fetch("http://localhost:2345/api/auths/verify_otp", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+        email: sessionStorage.getItem("userEmail"),
+        otp
+        })
+    });
+
+    const data = await res.json();
+
+    if(data.success){
+        sessionStorage.setItem("isVerified", "true");
+        timer.textContent = "Email verified successfully!";
+        timer.style.color = "green";
+        window.location.href = "signup.html";
+    } else {
+      timer.textContent = data.message || "Verification failed. Please try again.";
+      timer.style.color = "red";
+    }
+    });
+</script>
+
+</body>
+</html>

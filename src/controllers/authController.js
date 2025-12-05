@@ -1,7 +1,9 @@
 import User from "../models/UserModel.js";
+import Otp from "../models/OtpModel.js"
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from 'cloudinary';
+import nodemailer from "nodemailer";
 
 // Get all posts
 export const getProfile = async (req, res) => {
@@ -10,7 +12,7 @@ export const getProfile = async (req, res) => {
     const userProfile = await User.findById(userId)
     return res.json(userProfile)
   }catch(err){
-    return res.status(404).json({message: "Error getting profilr"})
+    return res.status(404).json({message: "Error getting profile"})
   }
 }
 
@@ -46,6 +48,8 @@ export const signUp = async (req, res) => {
       profilePic = result.secure_url;
     }
 
+    console.log(`${username}, ${firstname}, ${lastname}, ${email}, ${profilePic}`);
+
 
     const passwordHashed = await bcrypt.hash(password, 10);
     const user = new User({ username, firstname, profilePic, lastname, email, passwordHashed});
@@ -55,6 +59,61 @@ export const signUp = async (req, res) => {
     console.error("Error during sign up:", err);
     return res.status(500).json({ message: "Error creating an account" });
   }
+};
+
+export const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+  try {
+    
+    const record = await Otp.findOne(
+      { email }
+    );
+
+
+    if (!record)
+      return res.json({ success: false, message: "OTP not found" });
+
+    if (record.otp !== otp)
+      return res.json({ success: false, message: "Wrong OTP" });
+
+    if (record.expiresAt < Date.now())
+      return res.json({ success: false, message: "OTP expired" });
+
+    // success
+    return res.json({ success: true });
+  }catch (err) {
+    console.error("Error during OTP verification:", err);
+    return res.status(500).json({ message: "Error verifying OTP" });
+  }
+};
+
+export const sendOtp = async (req, res) => {
+  const {email} = req.body;
+  const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+  let otpCode = generateCode();
+  const transporter = nodemailer.createTransport({
+    service: "gmail", // or use smtp.ethereal.email for testing
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: `"Wordlink: " ${process.env.EMAIL_USER}`,
+    to: email,
+    subject: "Verify your email address",
+    text: `Your verification code is: ${otpCode},
+    Please use this code to verify your email address on Wordlink.`,
+  };
+
+  await transporter.sendMail(mailOptions);
+  const otp = await Otp.findOneAndUpdate(
+      { email },
+      { $set: { otp, expiresAt: Date.now() + 60000 } }, // this object is correct
+      { upsert: true, new: true }
+    );
+
 };
 
 export const logIn = async (req, res) => {

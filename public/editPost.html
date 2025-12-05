@@ -560,6 +560,40 @@
     // Global variable to store selected file
     let selectedFile = null;
     const token = localStorage.getItem("token");
+    const postId = sessionStorage.getItem("editPostId");
+
+    window.onload = async () => {
+      const textarea = document.getElementById('autoExpand');
+      if (!postId) {
+        return window.location.href = 'clients.html';
+      }
+      const res = await fetch(`http://localhost:2345/api/posts/${postId}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}`},
+      });
+
+      const data = await res.json();
+      if (res.ok){
+        textarea.innerText = data.content;
+        const previewImage = document.getElementById('previewImage');
+        const uploadContent = document.getElementById('uploadContent');
+        const addBox = document.getElementById('addBox');
+        const removeBtn = document.getElementById('removeBtn');
+        const fileInput = document.getElementById('fileInput');
+
+        if (data.imageUrl){
+            previewImage.src = data.imageUrl;
+            previewImage.classList.add('show');
+            uploadContent.classList.add('hide');
+            addBox.classList.add('has-image');
+            removeBtn.classList.add('show');
+            fileInput.classList.remove('active');
+        }
+      }else{
+        alert(data.message || 'Failed to load post data');
+      }
+
+    };
     
     function autoResize(textarea) {
       textarea.style.height = '44px';
@@ -625,14 +659,16 @@
       if (selectedFile) {
         formData.append('image', selectedFile);
       }
+
+      console.log(formData.get('text'), formData.get('image'));
       
       try {
         const postBtn = document.querySelector('.post-btn');
         postBtn.textContent = 'Posting...';
         postBtn.disabled = true;
         
-        const res = await fetch("http://localhost:2345/api/posts", {
-        method: "POST",
+        const res = await fetch(`http://localhost:2345/api/posts/${postId}`, {
+        method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`, // send token to backend
         },
@@ -642,7 +678,7 @@
         const data = await res.json();
         
         if (res.ok) {
-          alert('Post created successfully!');
+          alert('Post updated successfully!');
           window.location.href = 'clients.html';
           resetForm();
         } else {
@@ -650,7 +686,7 @@
         }
         
       } catch (error) {
-        console.error('Error:', error);
+        alert(error.message);
       } finally {
         const postBtn = document.querySelector('.post-btn');
         postBtn.textContent = 'Post';

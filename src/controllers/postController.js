@@ -187,8 +187,77 @@ export const deletePost = async (req, res) => {
 
 // Update post
 export const updatePost = async (req, res) => {
-  const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-  });
-  res.json(post);
+  try {
+    const { text } = req.body;
+    const imageFile = req.file;
+
+    if (!text || text.trim() === "") {
+      return res.status(400).json({ message: "Post content cannot be empty." });
+    }
+
+    let imageUrl = null;
+
+    if (imageFile) {
+      const uploadWithTimeout = (filePath, timeoutMs = 60000) => {
+        return new Promise((resolve, reject) => {
+          const uploadPromise = cloudinary.uploader.upload(filePath, { folder: "wordlink_posts" });
+          const to = setTimeout(() => reject(new Error('Cloudinary upload timed out')), timeoutMs);
+
+          uploadPromise
+            .then((r) => { clearTimeout(to); resolve(r); })
+            .catch((e) => { clearTimeout(to); reject(e); });
+        });
+      };
+
+      const maxRetries = 3;
+      let attempt = 0;
+      let lastError = null;
+
+      while (attempt < maxRetries) {
+        attempt++;
+        try {
+          const result = await uploadWithTimeout(imageFile.path);
+          imageUrl = result.secure_url;
+          break;
+        } catch (err) {
+          lastError = err;
+          console.warn(`Upload attempt ${attempt} failed:`, err.message || err);
+          if (attempt < maxRetries) {
+            await new Promise(r => setTimeout(r, 500 * Math.pow(2, attempt)));
+          }
+        }
+      }
+
+      // always clean up temp file
+      if (fs.existsSync(imageFile.path)) {
+        try { fs.unlinkSync(imageFile.path); } catch (e) { console.warn('Failed to remove temp file', e); }
+      }
+
+      if (!imageUrl && lastError) {
+        return res.status(500).json({ message: "Failed to upload image.", error: lastError.message });
+      }
+    }
+
+    // Build update object
+    const updateFields = {
+      content: text,
+    };
+    if (imageUrl){
+      updateFields.imageUrl = imageUrl;
+    }else{
+      updateFields.imageUrl = null; // to remove existing image
+    }
+
+    const post = await Post.findByIdAndUpdate(req.params.id, updateFields, { new: true });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found." });
+    }
+
+    return res.status(200).json({ message: "Post updated successfully!", post });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error while updating post." });
+  }
 };
+
