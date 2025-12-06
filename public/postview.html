@@ -78,7 +78,7 @@
         async function fetchAndRenderPost(postId) {
             const container = document.getElementById('post-container');
             
-            const res = await fetch(`http://localhost:2345/api/posts/${postId}`, {
+            const res = await fetch(`https://wordlink.up.railway.app/api/posts/${postId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -117,6 +117,12 @@
 
 
             container.innerHTML = `
+            <div class="comment flex fixed bottom-5 left-1/2 transform -translate-x-1/2 w-11/12 max-w-lg bg-white p-4 rounded-lg shadow-lg border border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 grey">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
+                </svg>
+                <textarea class="flex max-h-5 h-3 rounded-sm ml-3 p-4 overflow-y-hidden place-content-end border border-transparent colors-blue-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" placeholder="Enter comment"></textarea>
+            </div>
                 <div class="post-card bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition duration-300" data-id="${currentPost._id}">
                     
                     <!-- Header & Profile -->
