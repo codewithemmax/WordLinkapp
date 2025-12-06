@@ -78,7 +78,7 @@
         async function fetchAndRenderPost(postId) {
             const container = document.getElementById('post-container');
             
-            const res = await fetch(`https://wordlink.up.railway.app/api/posts/${postId}`, {
+            const res = await fetch(`http://localhost:2345/api/posts/${postId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
