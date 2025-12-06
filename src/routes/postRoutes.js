@@ -18,7 +18,7 @@ const upload = multer({
 });
 router.get("/", optionalAuthenticateToken, getPosts);
 router.post("/", authenticateToken, upload.single('image'), createPost);
-router.get("/:id", getPost);
+router.get("/:id", authenticateToken, getPost);
 router.put("/:id", authenticateToken, upload.single('image'), updatePost);
 router.delete("/:id", authenticateToken, deletePost);
 router.post("/:id/like", authenticateToken, likePost);

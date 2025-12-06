@@ -110,6 +110,7 @@ export const getPosts = async (req, res) => {
       likes: post.likes,
       comments: post.comments,
       createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
       isUserPost: post.userId ? post.userId.toString() === userId : false,
       profilePic: post.profilePic,
       isLiked: userId ? post.likedBy.includes(userId) : false // 👈 key part
@@ -175,14 +176,28 @@ export const commentPost = async (req, res) => {
 // Get single post
 export const getPost = async (req, res) => {
   const post = await Post.findById(req.params.id);
-  res.json(post);
+  const userId = req.user?.id
+  const formatted = {
+      _id: post._id,
+      username: post.username,
+      fullname: post.fullname,
+      content: post.content,
+      imageUrl: post.imageUrl,
+      likes: post.likes,
+      comments: post.comments,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      isUserPost: post.userId ? post.userId.toString() === userId : false,
+      profilePic: post.profilePic,
+      isLiked: userId ? post.likedBy.includes(userId) : false // 👈 key part
+    };
+  res.json(formatted);
 };
 
 // Delete post
 export const deletePost = async (req, res) => {
   await Post.findByIdAndDelete(req.params.id);
   res.json({ message: "Post deleted" });
-  console.log("Post deleted");
 };
 
 // Update post

@@ -266,20 +266,20 @@
     }
 
       .sidebar {
-      display: flex;
-      flex-direction: column;/* align items to the left */
-      justify-content: flex-start;
-      padding: 20px 0; /* add a bit of vertical spacing */
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 220px;
-      height: 100%;
-      background-color: #fff;
-      z-index: 10;
-      transition: transform 0.3s ease;
-      transform: translateX(-100%);
-      overflow-y: auto; /* ensures long lists can scroll */
+        display: flex;
+        flex-direction: column;/* align items to the left */
+        justify-content: flex-start;
+        padding: 20px 0; /* add a bit of vertical spacing */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 300px;
+        height: 100%;
+        background-color: #fff;
+        z-index: 10000;
+        transition: transform 0.3s ease;
+        transform: translateX(-100%);
+        overflow-y: auto; /* ensures long lists can scroll */
     }
       
       #menu-icon {
@@ -291,7 +291,7 @@
         cursor: pointer;
         padding: 5px;
         transition: left 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-        z-index: 11;
+        z-index: 1100;
         height: 1em;
         width: 1em;
         font-size: 40px;
@@ -299,7 +299,7 @@
 
     /* When sidebar opens, move the menu icon right */
     .sidebar.active ~ div nav #menu-icon {
-      left: 230px; /* sidebar width + gap */
+      left: 300px; /* sidebar width + gap */
       transform: rotate(90deg);
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
@@ -431,11 +431,11 @@
         outline: 0;
         border-radius: 12px; /* Slightly less aggressive border radius than 18px */
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
-        
         /* Positioning: Controls how the image content fills the container. */
         object-fit: cover;
         object-position: center;
       }
+
       .sidebar-notlogin{
         display: flex;
         flex-direction: column;
@@ -467,7 +467,7 @@
         transform: scale(0.97);
       }
 
-      .placeholder{
+      .content-box{
         display: none;
       }
 
@@ -576,104 +576,141 @@
         box-shadow:0 12px 28px rgba(239,68,68,0.35);
       }
 
-      
+      #like-btn.liked {
+            fill: #ef4444; /* Red for liked state */
+            stroke: #ef4444;
+        }
+        #like-btn:hover {
+             fill: #fca5a5; /* Lighter red on hover */
+             stroke: #fca5a5;
+        }
 
-      /* Laptop and up (1024px) */
-    @media (min-width: 1024px) {
-      /* 1. MAIN LAYOUT: Set up the body to use CSS Grid for a 2-column layout.
-        The first column is the sidebar (220px), the second is the main content.
-        We center the whole layout in the screen using a max-width on the body.
-      */
-      body {
+    @media (min-width: 760px) {
+      body{
         display: grid;
         overflow: hidden;
-        grid-template-columns: 220px 1fr 220px; /* Sidebar fixed width, main content fills */
-        width: 100%; /* Limit overall width for aesthetics */
+        grid-template-columns: 300px 1fr; 
+        height: 100vh; /* Make body fill the viewport */
+        width: 100%;
+        margin: 0;
       }
 
-      /* 2. SIDEBAR: Make it permanently visible and fixed.
-        We need to remove the mobile-style `position: fixed` or `transform` 
-        and make it part of the main grid flow.
-      */
-
-      body > div {
-          display: flex;
-          flex-direction: column;
-          height: 100vh; /* full column height */
-          overflow: hidden; /* prevent overall overflow */
-        }
-      .sidebar {
-        position: sticky; /* Keep it visible while scrolling the main content */
-        top: 0;
-        height: 100vh; /* Make it full height */
-        transform: translateX(0); /* Ensure it's always visible */
-        z-index: 10;
-        overflow-x: hidden;
-        left: 0;
-        border-right: 1px solid #e0e0e0; /* Visual separation from content */
-      }
-
-      /* 3. MAIN CONTENT: Center the main content area (the div containing nav/posts) 
-        and adjust its padding. 
-      */
-      div { /* This targets the <div> containing the nav, posts, etc. */
-        padding: 0;
-      }
-
-      .post-home{
-        height: 100vh;
-        flex: 1; /* take remaining vertical space */
-        padding: 0 20px;
-        margin: 0 auto;
-        position: relative;
-        max-width: 800px;
-        overflow-y: auto;
-      }
-
-    .placeholder {
-      display: flex; /* override display:none */
-      position: fixed;
-      right: 0px;
-      color: grey;
-      background-color: white;
-      border-left: 1px solid #e0e0e0;
-      top: 0px;
-      font-size: 15px;
-      text-align: center;
-      width: 280px;
-      height: 100%;
-      align-items: center;
-      justify-content: center;
-      z-index: 111;
-    }
-
-
-      /* 4. HIDE MOBILE MENU: The menu icon is no longer needed on PC.
-      */
-      #menu-icon {
+      .content-box {
         display: none;
       }
 
-      /* 5. NAV BAR: Adjust the navigation to compensate for the removed menu icon space.
-      */
-      nav {
-        padding-left: 20px;
-        min-width: 700px;
-            /* The sidebar is now separate, so adjust padding to keep it clean */
+      .sidebar {
+        position: sticky; 
+        top: 0;
+        height: 100vh;
+        transform: translateX(0);
+        z-index: 10;
+        border-right: 1px solid #e0e0e0;
+      }
+
+      
+      #menu-icon {
+        display: none;
       }
       
-      .home-title2 {
-        /* Since the menu icon is hidden, we remove its influence on the title */
-        gap: 10px;
+      /* 3. MAIN CONTENT: Scrollable, takes up the middle 1fr column */
+      .post-home { 
+        height: 100vh;
+        scrollbar-color: rgb(112, 109, 109) transparent; /* For Firefox */
+        flex: 1;
+        right: 0;
+        padding: 0; /* Remove horizontal padding from here */
+        position: relative;
+        max-width: none; /* Let the 1fr column control width */
+        overflow-y: auto; /* Ensures scrollable feed */
+        min-width: 400px; /* Prevents center column from collapsing too much */
+      }
+      
+      /* 4. NAVBAR: Ensure it spans the full width of the scrollable column */
+      nav {
+        position: sticky; /* Keep navigation visible at the top */
+        top: 0;
+        width: 100%; /* Spans the full width of the .post-home container */
+        padding: 10px 20px; /* Restore standard padding */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Ensure shadow is on top */
       }
     }
 
+      
+
+      
+
+      /* Laptop and up (1024px) */
+    /* Laptop and up (1024px) */
+@media (min-width: 1024px) {
+  /* 1. MAIN LAYOUT: Establishes the three-column structure */
+  body {
+    display: grid;
+    overflow: hidden;
+    grid-template-columns: 300px 1fr 350px; 
+    height: 100vh; /* Make body fill the viewport */
+    width: 100%;
+    margin: 0;
+  }
+  
+  /* 2. SIDEBAR: Fixed position within the grid column */
+  .sidebar {
+    position: sticky; 
+    top: 0;
+    height: 100vh;
+    transform: translateX(0);
+    z-index: 10;
+    border-right: 1px solid #e0e0e0;
+  }
+  
+  /* 3. MAIN CONTENT: Scrollable, takes up the middle 1fr column */
+  .post-home { 
+    height: 100vh;
+    scrollbar-color: rgb(112, 109, 109) transparent; /* For Firefox */
+    flex: 1;
+    padding: 0; /* Remove horizontal padding from here */
+    position: relative;
+    max-width: none; /* Let the 1fr column control width */
+    overflow-y: auto; /* Ensures scrollable feed */
+    min-width: 400px; /* Prevents center column from collapsing too much */
+  }
+  
+  /* 4. NAVBAR: Ensure it spans the full width of the scrollable column */
+  nav {
+    position: sticky; /* Keep navigation visible at the top */
+    top: 0;
+    width: 100%; /* Spans the full width of the .post-home container */
+    padding: 10px 20px; /* Restore standard padding */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Ensure shadow is on top */
+  }
+
+  /* 5. RIGHT COLUMN (Placeholder): Fixed position within the grid column */
+  .content-box {
+    display: flex; /* Makes the placeholder visible */
+    position: sticky;
+    background: transparent;
+    grid-column: 3;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    color: grey;
+    border-left: 1px solid #e0e0e0;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  /* 6. HIDE MOBILE MENU */
+  #menu-icon {
+    display: none;
+  }
+}
 </style>
   </head>
   <body>
     <aside class="sidebar" id="sidebar">
     </aside>
-    <div>
     <div class="post-home">
       <nav>
         <div class="home-title2">
@@ -713,18 +750,17 @@
       <section class="post-section">
       </section>
     </div>
-    <div class="placeholder">Nothing to see here...</div>
-  </div>
-  <div class="custom-box-overlay" id="deleteModal">
-      <div class="custom-box">
-        <div class="custom-box-title">Delete Post?</div>
-        <div class="custom-box-message">Are you sure you want to delete this post? Your will not be able to retrieve it again.</div>
-        <div class="custom-box-actions">
-          <button class="custom-box-btn cancel" onclick="closedeleteModal()">Cancel</button>
-          <button class="custom-box-btn confirm">Delete</button>
+    <div class="content-box">Nothing to see here...</div>
+    <div class="custom-box-overlay" id="deleteModal">
+        <div class="custom-box">
+          <div class="custom-box-title">Delete Post?</div>
+          <div class="custom-box-message">Are you sure you want to delete this post? Your will not be able to retrieve it again.</div>
+          <div class="custom-box-actions">
+            <button class="custom-box-btn cancel" onclick="closedeleteModal()">Cancel</button>
+            <button class="custom-box-btn confirm">Delete</button>
+          </div>
         </div>
-      </div>
-  </div>
+    </div>
   <script>
     const logIn = function(){
         window.location.href = "login.html"
@@ -733,6 +769,23 @@
     const token = localStorage.getItem('token')
     const sidebar = document.querySelector('.sidebar')
     const menu = document.getElementById('menu-icon')
+    const urlParams = new URLSearchParams(window.location.search);
+    const postIdParam = urlParams.get('postId');
+    const placeholder = document.querySelector('.content-box')
+
+    function openPost(postId) {
+      if (!postId) return;
+      
+      sessionStorage.setItem("currentPostId", postId);
+      if (window.innerWidth >= 1024) {
+        const newUrl = `${window.location.pathname}?postId=${postId}`;
+        window.history.pushState({}, "", newUrl);
+        placeholder.innerHTML = `<iframe src="postview.html?postId=${postId}" style="width:100%; height:100%; border:none; z-index: 10000"></iframe>`;
+        return
+      }
+      window.location.href = "postview.html?postId=" + postId;
+    }
+    
 
     function sharePost(postId) {
       if (navigator.share) {
@@ -752,7 +805,7 @@
       deletePost(postId);
       closedeleteModal();
     });
-g
+
     const editPost = (postId) => {
       sessionStorage.setItem("editPostId", postId);
       window.location.href = "editpost.html";
@@ -954,7 +1007,7 @@ const response = await fetch("http://localhost:2345/api/posts", {
 
     sortedPosts.forEach((posts) => {
       postDiv.innerHTML += `
-         <div class="post-card" data-id=${posts._id}>
+         <div class="post-card" onclick="openPost('${posts._id}')" data-id=${posts._id}>
             <div class="seperator"></div>
             <div class="post-header">
               <div class="post-profile">
@@ -988,11 +1041,13 @@ const response = await fetch("http://localhost:2345/api/posts", {
               ${posts.content.length > 300 ? `<button class="readmore">Read More</button>` : ""}
               ${posts.imageUrl ? `<img class="post-image" src="${posts.imageUrl}" alt="image"/>` : ""}
             </div>
-            ${posts.updatedAt ? `<div class="post-date">${posts.updatedAt}</div>`: ""}
+            ${posts.updatedAt ? `<div class="post-date">${new Date(posts.updatedAt).toLocaleString()}</div>`: ""}
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div class="post-tail">
                 <svg
-                id="like-btn"
+                id="like-btn ${posts.isLiked ? 'liked' : ''}"
+                
+                stroke="${posts.isLiked ? 'red' : 'currentColor'}"
                 fill="${posts.isLiked ? 'red' : 'none'}"
                 xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" 
