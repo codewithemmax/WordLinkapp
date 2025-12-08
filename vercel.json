@@ -1,10 +1,10 @@
 {
+  "cleanUrls": true,
   "redirects": [
     {
       "source": "/",
-      "destination": "/clients.html",
+      "destination": "/clients",
       "permanent": true
     }
-  ],
-  "clearUrls": true
+  ]
 }
