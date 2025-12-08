@@ -1,10 +1,9 @@
 {
   "cleanUrls": true,
-  "redirects": [
+  "rewites": [
     {
       "source": "/",
-      "destination": "/clients",
-      "permanent": true
+      "destination": "/clients"
     }
   ]
 }
