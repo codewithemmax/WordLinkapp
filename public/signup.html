@@ -397,7 +397,7 @@
       }
 
       // Page 1: Basic Info
-      document.getElementById("username").addEventListener("change", async (e) => {
+      document.getElementById("username").addEventListener("input", async (e) => {
         const next = document.getElementById("nextBtn1")
         const msg = document.getElementById("msg1");
         const res = await fetch("https://wordlink.up.railway.app/api/auths/check", {
@@ -557,6 +557,7 @@
           // Store in localStorage as JSON
           localStorage.setItem("signupData", JSON.stringify(dataObj));
           sessionStorage.setItem("userEmail", formData.email);
+          console.log("Posting...")
           window.location.href = "verifyEmail.html";
         }
       });
