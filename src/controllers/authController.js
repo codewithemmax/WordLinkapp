@@ -88,31 +88,35 @@ export const verifyOtp = async (req, res) => {
 };
 
 export const sendOtp = async (req, res) => {
-  const {email} = req.body;
-  const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
-  let otpCode = generateCode();
-  const transporter = nodemailer.createTransport({
-    service: "gmail", // or use smtp.ethereal.email for testing
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  const {email}  = req.body;
+  try {
+    const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+    let otpCode = generateCode();
+    const transporter = nodemailer.createTransport({
+      service: "gmail", // or use smtp.ethereal.email for testing
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-  const mailOptions = {
-    from: `"Wordlink: " ${process.env.EMAIL_USER}`,
-    to: email,
-    subject: "Verify your email address",
-    text: `Your verification code is: ${otpCode},
-    Please use this code to verify your email address on Wordlink.`,
-  };
+    const mailOptions = {
+      from: `"Wordlink: " ${process.env.EMAIL_USER}`,
+      to: email,
+      subject: "Verify your email address",
+      text: `Your verification code is: ${otpCode},
+      Please use this code to verify your email address on Wordlink.`,
+    };
 
-  await transporter.sendMail(mailOptions);
-  const otp = await Otp.findOneAndUpdate(
-      { email },
-      { $set: { otp, expiresAt: Date.now() + 60000 } }, // this object is correct
-      { upsert: true, new: true }
-    );
+    await transporter.sendMail(mailOptions);
+    const otp = await Otp.findOneAndUpdate(
+        { email },
+        { $set: { otp, expiresAt: Date.now() + 60000 } }, // this object is correct
+        { upsert: true, new: true }
+      );
+  }catch(err){
+    res.status(404).json({message: "Error sending verifixation mail"})
+  }
 
 };
 
