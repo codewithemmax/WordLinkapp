@@ -88,46 +88,63 @@ export const verifyOtp = async (req, res) => {
 };
 
 export const sendOtp = async (req, res) => {
-  const { email } = req.body;
-  try {
-    // 1. Generate the Code
-    const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
-    let otpCode = generateCode(); // <-- Using otpCode
+  const { email } = req.body;
 
-    // 2. Configure Nodemailer Transporter
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+  try {
+  // 1. Generate the Code
+  const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+  let otpCode = generateCode();
 
-    // 3. Configure Mail Options (using otpCode)
-    const mailOptions = {
-      from: `"Wordlink: " ${process.env.EMAIL_USER}`,
-      to: email,
-      subject: "Verify your email address",
-      text: `Your verification code is: ${otpCode}. Please use this code to verify your email address on Wordlink.`,
-    };
+  // 2. Configure Nodemailer Transporter
+  const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+  user: process.env.EMAIL_USER,
+  pass: process.env.EMAIL_PASS,
+  },
+        // Optional: Increase timeout for debugging connection issues
+        // timeout: 20000 // 20 seconds
+  });
 
-    // 4. Send Mail
-    await transporter.sendMail(mailOptions);
+  const mailOptions = {
+  from: `"Wordlink: " ${process.env.EMAIL_USER}`,
+  to: email,
+  subject: "Verify your email address",
+  text: `Your verification code is: ${otpCode}. Please use this code to verify your email address on Wordlink.`,
+  };
 
-    // 5. Save/Update OTP in Database (CORRECTED LINE)
-    await Otp.findOneAndUpdate(
-      { email },
-      { $set: { otp: otpCode, expiresAt: Date.now() + 60000 } }, // <-- FIX: Changed 'otp' to 'otp: otpCode'
-      { upsert: true, new: true }
-    );
+      // 3. Send Mail - This is the line that throws the ETIMEDOUT error
+  await transporter.sendMail(mailOptions);
 
-    // 6. Send success response
-    return res.json({ success: true, message: "Verification mail sent successfully" });
+      // 4. Save/Update OTP in Database (Using otpCode - assumes fix from previous response)
+  await Otp.findOneAndUpdate(
+  { email },
+  { $set: { otp: otpCode, expiresAt: Date.now() + 60000 } },
+  { upsert: true, new: true }
+  );
 
-  } catch (err) {
-    console.error("Error sending verification mail:", err); // Use console.error for better logging
-    return res.status(500).json({ message: "Error sending verification mail" }); // Changed status to 500 for server error
-  }
+  return res.json({ success: true, message: "Verification mail sent successfully" });
+
+  } catch (err) {
+    // ⬇️ THIS IS WHERE YOU CATCH THE ERROR ⬇️
+
+    // Log the full error object for server-side debugging
+    console.error("SMTP Error during email send:", err);
+
+    // Check for the specific Connection Timeout error code
+    if (err.code === 'ETIMEDOUT' || err.code === 'ESOCKET') {
+        return res.status(503).json({ 
+            success: false, 
+            message: "Email service is temporarily unavailable. Please check your network and settings." 
+        });
+    }
+
+    // Handle other errors (e.g., authentication, database issues)
+     return res.status(500).json({ 
+        success: false, 
+        message: "An internal server error occurred while processing the request." 
+    });
+ }
 };
 
 export const logIn = async (req, res) => {
