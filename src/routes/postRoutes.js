@@ -6,8 +6,7 @@ import {
   deletePost,
   updatePost,
   likePost,
-  commentPost,
-  getCommentsWithUserDetails
+  commentPost
 } from "../controllers/postController.js";
 import { optionalAuthenticateToken, authenticateToken } from "../middleware/authMiddleware.js";
 import multer from 'multer'
