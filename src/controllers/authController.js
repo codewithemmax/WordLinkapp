@@ -115,7 +115,8 @@ export const sendOtp = async (req, res) => {
         { upsert: true, new: true }
       );
   }catch(err){
-    res.status(404).json({message: "Error sending verifixation mail"})
+    console.log(err)
+    return res.status(404).json({message: "Error sending verifixation mail"})
   }
 
 };
