@@ -454,6 +454,7 @@
         formData.email = email;
         formData.password = password;
         msg.innerText = "";
+        sessionStorage.setItem("userEmail", formData.email);
         goToPage(1);
       });
 
@@ -479,7 +480,10 @@
         goToPage(2);
       });
 
-      document.getElementById("backBtn1").addEventListener("click", () => goToPage(0));
+      document.getElementById("backBtn1").addEventListener("click", () => {
+        goToPage(0);
+        sessionStorage.removeItem("userEmail");
+      });
 
       // Page 3: Date of Birth
       document.getElementById("nextBtn3").addEventListener("click", () => {
