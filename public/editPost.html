@@ -567,7 +567,7 @@
       if (!postId) {
         return window.location.href = 'clients.html';
       }
-      const res = await fetch(`https://wordlink.up.railway.app/api/posts/${postId}`, {
+      const res = await fetch(`http://localhost:2345/api/posts/${postId}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}`},
       });
@@ -667,7 +667,7 @@
         postBtn.textContent = 'Posting...';
         postBtn.disabled = true;
         
-        const res = await fetch(`https://wordlink.up.railway.app/api/posts/${postId}`, {
+        const res = await fetch(`http://localhost:2345/api/posts/${postId}`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`, // send token to backend

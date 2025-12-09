@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="icon" href="./images/icon.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>WordLink</title>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;700&family=Poppins:wght@500;600&display=swap');
@@ -153,9 +155,9 @@
         font-family: 'Inter', sans-serif;
       }
 
-      .post-card:active {
-        background-color: #f0f0f0;
-        transition: background 0.15s;
+
+      .post-card:first-of-type{
+        margin-top: 20px;
       }
 
       .post-date{
@@ -182,10 +184,6 @@
         width: 100%;
         align-items: center;
         justify-content: space-between;
-      }
-
-      .post-profile:active{
-        background-color: #dcdcdc;
       }
 
       .post-profile {
@@ -218,7 +216,7 @@
       }
 
       .content {
-        margin-top: 20px;
+        margin-top: 30px;
         font-size: 14px;
         overflow: hidden;
         line-height: 1.5;
@@ -241,6 +239,11 @@
 
       svg:active {
         transform: scale(0.9);
+        color: rgba(40, 40, 171, 0.749)
+      }
+
+      svg:hover {
+        color: #0A84FF;
       }
 
       .post-tail {
@@ -322,14 +325,17 @@
     }
 
       .sidebar li {
-        font-size: 15px;
+        font-size: 20px; /* Increased from 15px */
+        font-weight: 700; /* Makes text bold */
+        font-family: 'Montserrat', sans-serif; /* A better font for bold UI elements */
         width: 100%;
         padding: 20px 25px;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 15px; /* Increased gap slightly for better spacing */
         cursor: pointer;
         transition: background 0.2s ease;
+        color: #333; /* Ensures text is dark enough to be read clearly */
       }
 
       li:hover {
@@ -349,10 +355,10 @@
         width: fit-content;
       }
       
-      li svg{
+      li svg {
         height: 1em;
         width: 1em;
-        font-size: 15px;
+        font-size: 24px; /* Make icons slightly larger than the text */
       }
       
       .sidebar-profile p{
@@ -394,27 +400,46 @@
 
 
       
-      .follow{
-        display: flex;
-        font-weight: 500;
-        padding: 10px 0;
-        font-size: 13px;
-        gap: 10px;
-      }
-      
-      .follows{
-        display: flex;
-        width: fit-content;
-        justify-content: center;
-        color: #333;
-        font-family: 'Montserrat', sans-serif;
-        flex-direction: column;
-      }
+      /* Container for the stats row */
+    .follow {
+      display: flex;
+      padding: 15px 0; /* Add vertical breathing room */
+      gap: 30px; /* Space between "Following" and "Followers" groups */
+      border-bottom: 1px solid var(--border); /* Optional: adds a subtle divider line below stats */
+      margin-bottom: 10px;
+    }
 
-      .follows span:last-of-type{
-        align-self: center;
+    /* Individual stat block (e.g., the whole "Following 20" group) */
+    .follows {
+      display: flex;
+      flex-direction: column; /* Stack number on top of label */
+      align-items: flex-start; /* Align text to the left (cleaner) */
+      font-family: 'Inter', sans-serif;
+      cursor: pointer; /* Suggests these are clickable */
+    }
 
-      }
+    /* The Label (e.g., "Following") */
+    .follows span:first-of-type {
+      font-size: 13px;
+      color: var(--text-muted); /* Use your muted variable or #64748b */
+      font-weight: 500;
+      text-transform: capitalize;
+    }
+
+    /* The Number (e.g., "54") */
+    .follows span:last-of-type {
+      font-size: 18px; /* Make the number pop */
+      font-weight: 700; /* Bold */
+      color: var(--text); /* Dark/Black */
+      line-height: 1.2;
+      margin-top: 2px;
+    }
+
+    /* Hover effect for interactivity */
+    .follows:hover span:last-of-type {
+      text-decoration: underline;
+      color: var(--accent);
+    }
 
       .post-image{
         /* Spacing: Adds margin to separate the image from the text/tail. */
@@ -486,7 +511,6 @@
       .dropdown-menu li:hover{
         background-color: #878383;
       }
-
       .custom-box-overlay{
         position:fixed;
         top:0;
@@ -773,17 +797,34 @@
     const postIdParam = urlParams.get('postId');
     const placeholder = document.querySelector('.content-box')
 
-    function openPost(postId) {
+    function openPost(event, postId) {
+      const target = event.target
+
+  // If the click happened on (or inside) a button, textarea, SVG (icon), or dropdown
+    if (target.closest('button') || 
+        target.closest('textarea') || 
+        target.closest('svg') || 
+        target.closest('.dropdown-toggle') ||
+        target.closest('.dropdown-menu')) {
+        return; // STOP! Do not open the post.
+    }else{
+      target.style.background = "#f0f0f0"
+    }
+
+
       if (!postId) return;
       
       sessionStorage.setItem("currentPostId", postId);
       if (window.innerWidth >= 1024) {
         const newUrl = `${window.location.pathname}?postId=${postId}`;
+        target.style.background = "transparent"
         window.history.pushState({}, "", newUrl);
         placeholder.innerHTML = `<iframe src="postview.html?postId=${postId}" style="width:100%; height:100%; border:none; z-index: 10000"></iframe>`;
         return
       }
       window.location.href = "postview.html?postId=" + postId;
+      target.style.background = "transparent"
+
     }
     
 
@@ -829,7 +870,7 @@
 
     const deletePost = async (postId) => {
 
-      const res = await fetch(`https://wordlink.up.railway.app/api/posts/${postId}`, {
+      const res = await fetch(`http://localhost:2345/api/posts/${postId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -879,7 +920,7 @@ postDiv.addEventListener('click', async (e) => {
   if (!token) return alert("You must be logged in to like a post");
 
   try {
-    const res = await fetch(`https://wordlink.up.railway.app/api/posts/${postId}/like`, {
+    const res = await fetch(`http://localhost:2345/api/posts/${postId}/like`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -907,7 +948,7 @@ postDiv.addEventListener('click', async (e) => {
           return;
          }
 
-      const res = await fetch("https://wordlink.up.railway.app/api/posts", {
+      const res = await fetch("http://localhost:2345/api/posts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -933,7 +974,7 @@ postDiv.addEventListener('click', async (e) => {
     const loadTimeline = async () => {
       postDiv.innerHTML = ""
 
-const response = await fetch("https://wordlink.up.railway.app/api/posts", {
+const response = await fetch("http://localhost:2345/api/posts", {
   method: "GET",
   headers: {
           "Content-Type": "application/json",
@@ -944,7 +985,7 @@ const response = await fetch("https://wordlink.up.railway.app/api/posts", {
     const data = await response.json()
     /* posts data include  username fullname content likes createdAt likes comments*/
     if (token){
-      const profileRes = await fetch("https://wordlink.up.railway.app/api/auths/profile", {
+      const profileRes = await fetch("http://localhost:2345/api/auths/profile", {
       method: "GET",
       headers: {
           Authorization: `Bearer ${token}`,
@@ -1007,8 +1048,7 @@ const response = await fetch("https://wordlink.up.railway.app/api/posts", {
 
     sortedPosts.forEach((posts) => {
       postDiv.innerHTML += `
-         <div class="post-card" onclick="openPost('${posts._id}')" data-id=${posts._id}>
-            <div class="seperator"></div>
+         <div class="post-card" onclick="openPost(event,'${posts._id}')" data-id=${posts._id}>
             <div class="post-header">
               <div class="post-profile">
                 <img src=${posts.profilePic || "./images/profile1.webp "} alt="." />
@@ -1030,7 +1070,7 @@ const response = await fetch("https://wordlink.up.railway.app/api/posts", {
                     </button>
                   </li>
                   ${posts.isUserPost ? `<li><button class="dropdown-item" type="button" onclick="editPost('${posts._id}')">Edit Post</button></li>` : ""}
-                  ${posts.isUserPost ? `<li><button class="dropdown-item" type="button" onclick="showdeleteModal('${posts._id}')">Delete Post</button></li>` : ""}
+                  ${posts.isUserPost ? `<li><button class="dropdown-item w-full text-left text-sm text-red-600 hover:bg-red-50 hover:white" type="button" onclick="showdeleteModal('${posts._id}')">Delete Post</button></li>` : ""}
                 </ul>
               </div>
 
@@ -1054,7 +1094,7 @@ const response = await fetch("https://wordlink.up.railway.app/api/posts", {
                     stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                     </svg>
                 <span class="likes">${posts.likes}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <svg onclick= "openPost(event,'${posts._id}')" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
                 </svg>
                 <span class="comments">${posts.comments.length}</span>
@@ -1072,6 +1112,8 @@ const response = await fetch("https://wordlink.up.railway.app/api/posts", {
                 </svg>
               </div>
             </div>
+            
+            <div class="seperator"></div>
           </div>
       `
     })

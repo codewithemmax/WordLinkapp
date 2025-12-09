@@ -164,7 +164,7 @@ export const commentPost = async (req, res) => {
 
   const { text } = req.body;
   post.comments.push({
-    username: req.user.username,
+    postedBy: req.user.id,
     text,
     createdAt: new Date(),
   });
@@ -173,27 +173,107 @@ export const commentPost = async (req, res) => {
   res.json({ message: "Comment added" });
 };
 
+export const replyToComment = async (req, res) => {
+  try {
+    const { postId, commentId } = req.params;
+    const { text } = req.body; // The reply text
+    const userId = req.user.id; // Assuming you have user ID from middleware
+
+    // 1. Find the Post
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    // 2. Find the specific Comment inside the post
+    const comment = post.comments.id(commentId);
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    // 3. Add the Reply to the 'replies' array
+    const newReply = {
+      userId,
+      text,
+      createdAt: new Date()
+    };
+
+    comment.replies.push(newReply);
+
+    // 4. Save the parent Post
+    await post.save();
+
+    // 5. Populate user details to send back to frontend immediately
+    // Note: We only populate the NEW reply for efficiency, or you can re-fetch the whole post
+    const populatedPost = await Post.findById(postId).populate({
+        path: 'comments.replies.userId',
+        select: 'username fullname profilePic'
+    });
+    
+    // Find the comment again to return just the updated thread
+    const updatedComment = populatedPost.comments.id(commentId);
+
+    return res.status(201).json({ message: "Reply added", replies: updatedComment.replies });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 // Get single post
+// Get single post with populated comments
 export const getPost = async (req, res) => {
-  const post = await Post.findById(req.params.id);
-  const userId = req.user?.id
-  const formatted = {
+  try {
+    const userId = req.user?.id;
+
+    // 1. Fetch the post and Populate user details
+    const post = await Post.findById(req.params.id)
+      .populate({
+        path: "comments.postedBy", // Database uses 'postedBy' for comments
+        select: "username fullname profilePic"
+      })
+      .populate({
+        path: "comments.replies.userId", // Database uses 'userId' for replies
+        select: "username fullname profilePic"
+      });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // 2. Map through comments to rename 'postedBy' -> 'userId'
+    // This fixes the issue where frontend expects 'userId' but DB has 'postedBy'
+    const formattedComments = post.comments.map(comment => {
+      return {
+        _id: comment._id,
+        text: comment.text,
+        createdAt: comment.createdAt,
+        replies: comment.replies, // Replies already use 'userId', so they are fine
+        
+        // THE FIX: Send 'postedBy' data as 'userId'
+        userId: comment.postedBy 
+      };
+    });
+
+    // 3. Format the final response
+    const formatted = {
       _id: post._id,
       username: post.username,
       fullname: post.fullname,
       content: post.content,
       imageUrl: post.imageUrl,
       likes: post.likes,
-      comments: post.comments,
+      comments: formattedComments, // Use our fixed comments array
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
       isUserPost: post.userId ? post.userId.toString() === userId : false,
       profilePic: post.profilePic,
-      isLiked: userId ? post.likedBy.includes(userId) : false // 👈 key part
+      isLiked: userId ? post.likedBy.includes(userId) : false
     };
-  res.json(formatted);
-};
 
+    res.json(formatted);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error fetching post" });
+  }
+};
 // Delete post
 export const deletePost = async (req, res) => {
   await Post.findByIdAndDelete(req.params.id);

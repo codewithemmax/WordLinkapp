@@ -4,350 +4,302 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordlink Post Detail</title>
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="./images/icon.png" type="image/x-icon">
     <style>
-        /* Custom styles to ensure the container scales nicely */
         body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Align content to the top */
+            align-items: flex-start;
             background-color: #f7f9fb;
+            overflow-y: auto;
         }
 
         .post-section {
             width: 100%;
             max-width: 600px;
             padding: 1rem;
-            margin-top: 2rem; /* Add margin to look centered on screen */
+            margin-top: 1rem;
+            padding-bottom: 100px;
         }
 
-        .post-content-full {
-            /* For the full content state */
-            display: block;
-            overflow: visible;
-            max-height: none;
-        }
+        .icon-btn { transition: color 0.2s, transform 0.1s; }
+        .icon-btn:hover { color: #1d9bf0; transform: scale(1.05); }
+        
+        .like-btn.liked { fill: #ef4444; stroke: #ef4444; }
+        .like-btn:hover { fill: #fca5a5; stroke: #fca5a5; }
 
-        .post-content-collapsed {
-            /* For the collapsed state (limit to 4 lines) */
-            display: -webkit-box;
-            -webkit-line-clamp: 4;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        /* Base SVG icon styling to make them clickable/visible */
-        .icon-btn {
-            transition: color 0.2s, transform 0.1s;
-        }
-        .icon-btn:hover {
-            color: #1d9bf0; /* Twitter Blue */
-            transform: scale(1.05);
-        }
-        .like-btn.liked {
-            fill: #ef4444; /* Red for liked state */
-            stroke: #ef4444;
-        }
-        .like-btn:hover {
-             fill: #fca5a5; /* Lighter red on hover */
-             stroke: #fca5a5;
+        .reply-line {
+            border-left: 2px solid #e5e7eb;
+            margin-left: 10px;
+            padding-left: 15px;
         }
     </style>
 </head>
 <body>
-    <div class="post-section" id="post-container">
-        <!-- Content will be rendered here -->
-        <div class="text-center p-8 text-gray-500">Loading post...</div>
+    <div class="post-section">
+        <div id="post-container">
+            <div class="text-center p-8 text-gray-500">Loading post...</div>
+        </div>
+
+        <div class="mt-6 mb-4 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-gray-800">Comments</h3>
+            <span class="text-sm text-gray-500" id="comment-count-display">0 comments</span>
+        </div>
+
+        <div id="comments-list" class="space-y-4">
+            </div>
+    </div>
+
+    <div class="flex fixed bottom-5 left-1/2 transform -translate-x-1/2 w-11/12 max-w-lg bg-white p-3 rounded-xl shadow-2xl border border-gray-200 items-center z-50">
+        <img id="current-user-pic" 
+             src="./images/profile1.webp" 
+             onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'" 
+             class="w-8 h-8 rounded-full border border-gray-200 object-cover">
+        
+        <textarea id="comment-input"
+            class="flex-1 h-10 max-h-24 rounded-full ml-3 px-4 py-2 text-sm border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none transition-all" 
+            placeholder="Add a comment..."></textarea>
+            
+        <button onclick="submitComment()" class="ml-2 p-2 bg-blue-500 rounded-full hover:bg-blue-600 text-white transition transform active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 -rotate-45 relative left-[-1px] top-[1px]">
+                <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+            </svg>
+        </button>
     </div>
 
     <script>
-
-        // Global state for simplicity in a single-file demo
         let currentPost = null;
+        const token = localStorage.getItem('token');
+        const BASE_URL = "http://localhost:2345/api"; 
+
+        window.onload = function() {
+            const postId = sessionStorage.getItem('currentPostId');
+            if(postId) {
+                fetchAndRenderPost(postId);
+            } else {
+                document.getElementById('post-container').innerHTML = `<div class="text-center text-red-500 mt-10">No post selected. Go back.</div>`;
+            }
+        };
         
-        let contentTruncated = true; // Default to truncated view
-        let contentClass = 'post-content-collapsed';
-
-        /**
-         * Simulates fetching a post, updates the global state, and renders.
-         */
         async function fetchAndRenderPost(postId) {
-            const container = document.getElementById('post-container');
-            
-            const res = await fetch(`http://localhost:2345/api/posts/${postId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-
-            currentPost = await res.json();
-
-            renderPost(container);
+            try {
+                const res = await fetch(`${BASE_URL}/posts/${postId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!res.ok) throw new Error("Failed to load post");
+                
+                currentPost = await res.json(); 
+                
+                renderPostCard();
+                renderCommentsList();
+            } catch (err) {
+                console.error(err);
+                document.getElementById('post-container').innerHTML = `<div class="text-center text-red-500">Error loading post.</div>`;
+            }
         }
 
-        /**
-         * Renders the post content into the container.
-         */
-        function renderPost(container) {
-            if (!currentPost) {
-                container.innerHTML = `<div class="text-center p-8 text-red-500">Post not found.</div>`;
-                return;
-            }
-
-            // Determine content class for truncation
+        function renderPostCard() {
+            const container = document.getElementById('post-container');
+            const formattedDate = new Date(currentPost.createdAt).toLocaleString();
             
-            
-            const content = document.getElementById('post-text')
-            if (content){
-              contentClass = content.length > 300 && contentTruncated 
-                ? 'post-content-collapsed' 
-                : 'post-content-full';
-            
-            }
-            // Format date for display
-            const formattedDate = new Date(currentPost.updatedAt).toLocaleString('en-US', { 
-                year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-            });
-
+            // Generate fallback for main post author
+            const authorPic = currentPost.profilePic || `https://ui-avatars.com/api/?name=${currentPost.username}&background=random`;
 
             container.innerHTML = `
-            <div class="comment flex fixed bottom-5 left-1/2 transform -translate-x-1/2 w-11/12 max-w-lg bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 grey">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
-                </svg>
-                <textarea class="flex max-h-5 h-3 rounded-sm ml-3 p-4 overflow-y-hidden place-content-end border border-transparent colors-blue-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" placeholder="Enter comment"></textarea>
-            </div>
-                <div class="post-card bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition duration-300" data-id="${currentPost._id}">
-                    
-                    <!-- Header & Profile -->
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex items-center">
-                            <img src="${currentPost.profilePic}" onerror="this.onerror=null; this.src='https://placehold.co/50x50/334155/ffffff?text=User';" alt="${currentPost.fullname} profile" class="w-12 h-12 rounded-full mr-3 shadow-md border-2 border-white" />
-                            <div class="text-sm">
-                                <span class="block font-bold text-gray-900">${currentPost.fullname}</span>
-                                <span class="block text-gray-500 text-xs">${currentPost.username}</span>
-                            </div>
-                        </div>
-
-                        <!-- Dropdown Menu (Simplified for demo) -->
-                        <div class="relative group">
-                            <svg class="w-6 h-6 text-gray-400 hover:text-gray-700 cursor-pointer icon-btn" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
-                            </svg>
-                            <!-- Mock Dropdown List -->
-                            <ul class="absolute right-0 top-6 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-xl hidden group-hover:block z-10">
-                                <li><button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg" onclick="handleFollow('${currentPost.username}')">${null? 'Unfollow' : 'Follow'} ${currentPost.username}</button></li>
-                                ${currentPost.isUserPost ? `<li><button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="editPost('${currentPost._id}')">Edit Post</button></li>` : ""}
-                                ${currentPost.isUserPost ? `<li><button class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-lg" onclick="showdeleteModal('${currentPost._id}')">Delete Post</button></li>` : ""}
-                                
-                            </ul>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="flex items-center mb-4">
+                        <img src="${authorPic}" 
+                             onerror="this.src='https://ui-avatars.com/api/?name=Error'"
+                             class="w-12 h-12 rounded-full mr-3 border object-cover">
+                        <div>
+                            <h4 class="font-bold text-gray-900">${currentPost.fullname || currentPost.username}</h4>
+                            <p class="text-xs text-gray-500">@${currentPost.username} • ${formattedDate}</p>
                         </div>
                     </div>
 
-                    <!-- Content -->
-                    <div class="post-body">
-                        <p class="text-gray-800 leading-relaxed text-base mb-3 ${contentClass}" id="post-text">${currentPost.content}</p>
-                        
-                        <!-- Read More Button -->
-                        ${currentPost.content.length > 300 ? `
-                            <button onclick="toggleReadMore()" class="text-blue-500 hover:text-blue-700 text-sm font-medium mb-3">
-                                ${contentTruncated ? 'Read More' : 'Read Less'}
-                            </button>` 
-                        : ""}
-                        
-                        <!-- Image -->
-                        ${currentPost.imageUrl ? `<img src="${currentPost.imageUrl}" onerror="this.onerror=null; this.src='https://placehold.co/600x400/94a3b8/ffffff?text=Image+Unavailable';" alt="Post image" class="w-full h-auto rounded-lg mt-3 shadow-md" />` : ""}
-                        
-                        <!-- Date -->
-                        ${currentPost.updatedAt ? `<div class="text-gray-400 text-xs mt-3">${formattedDate}</div>`: ""}
-                    </div>
+                    <p class="text-gray-800 text-base leading-relaxed mb-3">${currentPost.content}</p>
+                    ${currentPost.imageUrl ? `<img src="${currentPost.imageUrl}" class="w-full rounded-xl mb-3 shadow-sm object-cover">` : ''}
 
-                    <!-- Footer / Interaction Bar -->
-                    <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-100">
-                        <div class="flex space-x-6">
-                            <!-- Like Button -->
-                            <button onclick="toggleLike('${currentPost._id}')" class="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition duration-150">
-                                <svg id="like-btn" 
-                                    class="w-6 h-6 icon-btn like-btn ${currentPost.isLiked ? 'liked' : ''}" 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    viewBox="0 0 24 24" 
-                                    stroke-width="1.5" 
-                                    stroke="${currentPost.isLiked ? 'red' : 'currentColor'}"
-                                    fill="${currentPost.isLiked ? 'red' : 'none'}">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                                </svg>
-                                <span class="text-sm font-medium">${currentPost.likes}</span>
-                            </button>
-
-                            <!-- Comment Button -->
-                            <button onclick="openPost('${currentPost._id}')" class="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition duration-150">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 icon-btn">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
-                                </svg>
-                                <span class="text-sm font-medium">${currentPost.comments.length}</span>
-                            </button>
-
-                            <!-- Repost/Share Button -->
-                            <button class="flex items-center space-x-1 text-gray-500 hover:text-green-500 transition duration-150">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 icon-btn">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
-                                </svg>
-                                <span class="text-sm font-medium">0</span> <!-- Mock shares -->
-                            </button>
-                        </div>
-
-                        <!-- Save/Bookmark Button -->
-                        <button class="text-gray-500 hover:text-yellow-500 transition duration-150">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 icon-btn">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                    <div class="flex items-center justify-between pt-3 border-t border-gray-100 text-gray-500 text-sm">
+                        <button onclick="toggleLike()" class="flex items-center space-x-2 hover:text-red-500 transition">
+                            <svg class="w-5 h-5 like-btn ${currentPost.isLiked ? 'liked' : ''}" 
+                                 fill="${currentPost.isLiked ? 'red' : 'none'}" 
+                                 stroke="${currentPost.isLiked ? 'red' : 'currentColor'}" 
+                                 viewBox="0 0 24 24" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                             </svg>
+                            <span>${currentPost.likes}</span>
                         </button>
+                        <span>${currentPost.comments.length} Comments</span>
                     </div>
                 </div>
             `;
+            
+            document.getElementById('comment-count-display').innerText = `${currentPost.comments.length} comments`;
         }
 
-        /**
-         * Toggles the like status of the post and re-renders.
-         */
-        function toggleLike(postId) {
-            if (!currentPost || currentPost._id !== postId) return;
-            
-            currentPost.isLiked = !currentPost.isLiked;
-            currentPost.likes += currentPost.isLiked ? 1 : -1;
+        function renderCommentsList() {
+            const list = document.getElementById('comments-list');
+            list.innerHTML = "";
 
-            const likeBtn = document.querySelector('.post-card .like-btn');
-            const likesCount = document.querySelector('.post-card .likes');
+            if (!currentPost.comments || currentPost.comments.length === 0) {
+                list.innerHTML = `<div class="text-center text-gray-400 py-10">No comments yet. Be the first!</div>`;
+                return;
+            }
 
-            if (likeBtn) {
-                if (currentPost.isLiked) {
-                    likeBtn.classList.add('liked');
-                    likeBtn.setAttribute('fill', 'red');
-                    likeBtn.setAttribute('stroke', 'red');
-                } else {
-                    likeBtn.classList.remove('liked');
-                    likeBtn.setAttribute('fill', 'none');
-                    likeBtn.setAttribute('stroke', 'currentColor');
+            [...currentPost.comments].reverse().forEach(comment => {
+                // --- SAFE USER CHECK ---
+                const safeUser = comment.userId; // Handles null users
+                
+                const hasReplies = comment.replies && comment.replies.length > 0;
+                const replyCount = hasReplies ? comment.replies.length : 0;
+                
+                let repliesHtml = '';
+                let toggleButtonHtml = '';
+
+                if (hasReplies) {
+                    const firstReply = comment.replies[0];
+                    const safeReplyUser = firstReply.userId;
+                    const firstReplyDate = new Date(firstReply.createdAt).toLocaleString();
+                    
+                    repliesHtml += `
+                        <div class="reply-line mt-3">
+                            <div class="flex items-start">
+                                <img src="${safeReplyUser.profilePic}" 
+                                     onerror="this.src='https://ui-avatars.com/api/?name=Error'"
+                                     class="w-6 h-6 rounded-full mr-2 mt-1 object-cover">
+                                <div class="bg-gray-50 p-2 rounded-lg w-full">
+                                    <div class="flex justify-between items-baseline">
+                                        <span class="font-semibold text-xs text-gray-800">${safeReplyUser.username}</span>
+                                        <span class="text-[5px] text-gray-400">${firstReplyDate}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-700 mt-1">${firstReply.text}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    if (replyCount > 1) {
+                        const remainingCount = replyCount - 1;
+                        let hiddenRepliesHtml = '<div id="replies-hidden-' + comment._id + '" class="hidden">';
+                        
+                        for (let i = 1; i < comment.replies.length; i++) {
+                            const reply = comment.replies[i];
+                            const safeHiddenReplyUser = reply.userId;
+                            const rDate = new Date(reply.createdAt).toLocaleString();
+                            
+                            hiddenRepliesHtml += `
+                                <div class="reply-line mt-2">
+                                    <div class="flex items-start">
+                                        <img src="${safeHiddenReplyUser.profilePic}" 
+                                             onerror="this.src='https://ui-avatars.com/api/?name=Error'"
+                                             class="w-6 h-6 rounded-full mr-2 mt-1 object-cover">
+                                        <div class="bg-gray-50 p-2 rounded-lg w-full">
+                                            <div class="flex justify-between items-baseline">
+                                                <span class="font-semibold text-xs text-gray-800">${safeHiddenReplyUser.username}</span>
+                                                <span class="text-[10px] text-gray-400">${rDate}</span>
+                                            </div>
+                                            <p class="text-sm text-gray-700 mt-1">${reply.text}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        hiddenRepliesHtml += '</div>';
+                        repliesHtml += hiddenRepliesHtml;
+
+                        toggleButtonHtml = `
+                            <button onclick="toggleReplies('${comment._id}', ${remainingCount})" 
+                                id="btn-toggle-${comment._id}"
+                                class="ml-8 mt-2 text-xs font-semibold text-blue-500 hover:underline flex items-center">
+                                <span class="mr-1">___</span> View ${remainingCount} more replies
+                            </button>
+                        `;
+                    }
                 }
+
+                const commentDate = new Date(comment.createdAt).toLocaleString();
+                const commentHtml = `
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 transition hover:shadow-md">
+                        <div class="flex items-start">
+                            <img src="${safeUser.profilePic}" 
+                                 onerror="this.src='https://ui-avatars.com/api/?name=Error'"
+                                 class="w-10 h-10 rounded-full mr-3 border border-gray-100 object-cover">
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <span class="font-bold text-sm text-gray-900">${safeUser.username}</span>
+                                        <span class="text-[10px] text-gray-400 ml-2">${commentDate}</span>
+                                    </div>
+                                </div>
+                                <p class="text-gray-800 text-sm mt-1 leading-relaxed">${comment.text}</p>
+                                
+                                <div class="flex gap-4 mt-2">
+                                    <button class="text-xs text-gray-500 font-medium hover:text-blue-500">Reply</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-2">
+                            ${repliesHtml}
+                            ${toggleButtonHtml}
+                        </div>
+                    </div>
+                `;
+                list.innerHTML += commentHtml;
+            });
+        }
+
+        function toggleReplies(commentId, count) {
+            const hiddenDiv = document.getElementById(`replies-hidden-${commentId}`);
+            const btn = document.getElementById(`btn-toggle-${commentId}`);
+            if (hiddenDiv.classList.contains('hidden')) {
+                hiddenDiv.classList.remove('hidden');
+                btn.innerHTML = `<span class="mr-1">___</span> Hide replies`;
+            } else {
+                hiddenDiv.classList.add('hidden');
+                btn.innerHTML = `<span class="mr-1">___</span> View ${count} more replies`;
             }
-            if (likesCount) {
-                likesCount.textContent = currentPost.likes;
-            }
         }
 
-        /**
-         * Toggles the content between truncated and full view.
-         */
-        function toggleReadMore() {
-            if (!currentPost) return;
-            const postText = document.getElementById('post-text');
-            const readMoreBtn = postText.nextElementSibling; // The button immediately following the content
-
-            if (postText) {
-                postText.classList.toggle('post-content-collapsed', currentPost.contentTruncated);
-                postText.classList.toggle('post-content-full', !currentPost.contentTruncated);
-            }
-
-            if (readMoreBtn && readMoreBtn.tagName === 'BUTTON') {
-                readMoreBtn.textContent = currentPost.contentTruncated ? 'Read More' : 'Read Less';
-            }
-        }
-
-        /**
-         * Placeholder for opening the post detail/comment page.
-         */
-        function openPost(postId) {
-            // In a multi-page app, this would be a redirect: window.location.href = `/post/${postId}`;
-        }
-
-        /**
-         * Placeholder for the follow/unfollow logic.
-         */
-        function handleFollow(username) {
-            // Re-render to update the dropdown button text
-            fetchAndRenderPost(currentPost._id); 
-        }
-
-        /**
-         * Placeholder for the edit action.
-         */
-        function editPost(postId) {
-             console.log(`Opening edit modal for post: ${postId}`);
-             // In a real app, open a modal with the post data for editing.
-        }
-
-        /**
-         * Placeholder for showing a delete confirmation modal.
-         */
-        function showdeleteModal(postId) {
-             console.log(`Showing confirmation modal to delete post: ${postId}`);
-             // Use a custom modal UI here, as 'confirm()' is forbidden.
-        }
-
-        /**
-         * Placeholder for the share action (e.g., copy link or open share sheet).
-         */
-        function sharePost(postId) {
-            const urlToShare = `https://your-app.com/post/${postId}`;
-            // Use execCommand('copy') for cross-browser compatibility in iFrames
-            const input = document.createElement('input');
-            input.value = urlToShare;
-            document.body.appendChild(input);
-            input.select();
-            
+        async function submitComment() {
+            const input = document.getElementById('comment-input');
+            const text = input.value.trim();
+            if (!text) return;
             try {
-                document.execCommand('copy');
-                alertMessage(`Link copied to clipboard!`, 'success');
-            } catch (err) {
-                alertMessage(`Could not copy link.`, 'error');
-            }
-            document.body.removeChild(input);
-            console.log(`Sharing URL: ${urlToShare}`);
+                const res = await fetch(`${BASE_URL}/posts/${currentPost._id}/comment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+                if (res.ok) {
+                    input.value = ""; 
+                    fetchAndRenderPost(currentPost._id); 
+                } else {
+                    alert("Failed to post comment");
+                }
+            } catch (err) { console.error(err); }
         }
 
-        /**
-         * Custom message box (since alert() is forbidden).
-         */
-        function alertMessage(message, type) {
-            let existingAlert = document.getElementById('custom-alert');
-            if (existingAlert) { existingAlert.remove(); }
-            
-            const alertDiv = document.createElement('div');
-            alertDiv.id = 'custom-alert';
-            alertDiv.className = `fixed top-5 left-1/2 transform -translate-x-1/2 p-4 rounded-lg shadow-xl text-white font-semibold z-50 transition-opacity duration-300`;
-            alertDiv.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444'; // green or red
-            alertDiv.textContent = message;
-            document.body.appendChild(alertDiv);
-
-            setTimeout(() => {
-                alertDiv.style.opacity = '0';
-                setTimeout(() => alertDiv.remove(), 300);
-            }, 3000);
+        async function toggleLike() {
+             currentPost.isLiked = !currentPost.isLiked;
+             currentPost.likes += currentPost.isLiked ? 1 : -1;
+             renderPostCard(); 
+             try {
+                await fetch(`${BASE_URL}/posts/${currentPost._id}/like`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+             } catch(e) { console.error(e); }
         }
-
-        // Initialize the app on page load
-        window.onload = function() {
-            // For a complete demo, we'll just use the mock ID. 
-            // The original logic of getting from sessionStorage is commented out.
-            // const postId = || MOCK_POST._id;
-            const postId = sessionStorage.getItem('currentPostId');
-            fetchAndRenderPost(postId);
-        };
-
-        window.onresize = function() {
-            if (window.innerWidth < 1024) {
-                // If resized to mobile, remove the iframe and go back to main view
-                sessionStorage.removeItem("currentPostId");
-                window.location.href = 'clients.html'; // or the main page
-            }
-        };
     </script>
 </body>
 </html>

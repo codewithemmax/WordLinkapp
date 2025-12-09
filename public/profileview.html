@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WordLink || Profile View</title>
+    <link rel="icon" href="./images/icon.png" type="image/x-icon">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f8f8f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .profile-container {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px #ccc;
+        width: 400px;
+        text-align: center;
+      }
+      .profile-pic {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+      }
+      .username {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .bio {
+        font-size: 16px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="profile-container">
+      <img src="./images/default-profile.png" alt="Profile Picture" class="profile-pic" />
+      <div class="username">Username</div>
+      <div class="bio">This is a sample bio for the user profile.</div>
+    </div>
+  </body>
