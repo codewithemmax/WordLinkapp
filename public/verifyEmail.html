@@ -180,7 +180,7 @@
         // send new OTP request
         startCountdown();
         try{
-            const res = await fetch("http://localhost:2345/api/auths/send_otp", {
+            const res = await fetch("https://wordlink.up.railway.app/api/auths/send_otp", {
               method: "POST",
               headers: {"Content-Type":"application/json"},
               body: JSON.stringify({
@@ -222,7 +222,7 @@
     let otp = "";
     inputs.forEach(input => otp += input.value);
 
-    const res = await fetch("http://localhost:2345/api/auths/verify_otp", {
+    const res = await fetch("https://wordlink.up.railway.app/api/auths/verify_otp", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({

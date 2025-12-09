@@ -870,7 +870,7 @@
 
     const deletePost = async (postId) => {
 
-      const res = await fetch(`http://localhost:2345/api/posts/${postId}`, {
+      const res = await fetch(`https://wordlink.up.railway.app/api/posts/${postId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -920,7 +920,7 @@ postDiv.addEventListener('click', async (e) => {
   if (!token) return alert("You must be logged in to like a post");
 
   try {
-    const res = await fetch(`http://localhost:2345/api/posts/${postId}/like`, {
+    const res = await fetch(`https://wordlink.up.railway.app/api/posts/${postId}/like`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -948,7 +948,7 @@ postDiv.addEventListener('click', async (e) => {
           return;
          }
 
-      const res = await fetch("http://localhost:2345/api/posts", {
+      const res = await fetch("https://wordlink.up.railway.app/api/posts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -974,7 +974,7 @@ postDiv.addEventListener('click', async (e) => {
     const loadTimeline = async () => {
       postDiv.innerHTML = ""
 
-const response = await fetch("http://localhost:2345/api/posts", {
+const response = await fetch("https://wordlink.up.railway.app/api/posts", {
   method: "GET",
   headers: {
           "Content-Type": "application/json",
@@ -985,7 +985,7 @@ const response = await fetch("http://localhost:2345/api/posts", {
     const data = await response.json()
     /* posts data include  username fullname content likes createdAt likes comments*/
     if (token){
-      const profileRes = await fetch("http://localhost:2345/api/auths/profile", {
+      const profileRes = await fetch("https://wordlink.up.railway.app/api/auths/profile", {
       method: "GET",
       headers: {
           Authorization: `Bearer ${token}`,

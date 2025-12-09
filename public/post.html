@@ -631,7 +631,7 @@
         postBtn.textContent = 'Posting...';
         postBtn.disabled = true;
         
-        const res = await fetch("http://localhost:2345/api/posts", {
+        const res = await fetch("https://wordlink.up.railway.app/api/posts", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`, // send token to backend

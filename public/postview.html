@@ -74,7 +74,7 @@
     <script>
         let currentPost = null;
         const token = localStorage.getItem('token');
-        const BASE_URL = "http://localhost:2345/api"; 
+        const BASE_URL = "https://wordlink.up.railway.app/api"; 
 
         window.onload = function() {
             const postId = sessionStorage.getItem('currentPostId');
@@ -84,7 +84,7 @@
                 document.getElementById('post-container').innerHTML = `<div class="text-center text-red-500 mt-10">No post selected. Go back.</div>`;
             }
         };
-        
+
         async function fetchAndRenderPost(postId) {
             try {
                 const res = await fetch(`${BASE_URL}/posts/${postId}`, {
