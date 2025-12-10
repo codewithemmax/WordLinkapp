@@ -1,22 +1,46 @@
-# 🔗 Wordlink: The Webpage Dictionary Connector
+# 📣 Wordlink: The Public Square for Real-Time Conversation
 
-**Wordlink** is a powerful online tool designed to enhance reading comprehension and language learning. It acts as a wrapper that links nearly every word on a webpage directly to online dictionaries, providing quick, context-aware look-ups. It is often used in conjunction with Multidict to offer a flexible dictionary look-up experience.
+**Wordlink** is a dynamic microblogging application designed purely for **public conversation, content discovery, and community engagement**. Share your thoughts, follow breaking news, and participate in a global discussion in short, impactful, and entirely public posts.
 
 ## ✨ Core Capabilities
 
-Wordlink is built to seamlessly integrate dictionary look-up into the reading experience without requiring browser extensions or external tools.
+Wordlink is built around the philosophy that all communication should be transparent and open to the community, making it ideal for tracking news, events, and public discourse.
 
-### 1. **Seamless Dictionary Integration**
-* **Word-by-Word Linking:** Every relevant word on a processed webpage becomes a clickable link. Clicking the word opens its definition in a chosen online dictionary.
-* **Non-Intrusive Design:** The original formatting, layout, and functionality of the webpage (including existing links and images) are preserved.
-* **Multidict Backend:** Leverages the power of **Multidict** to allow users to easily switch between multiple high-quality dictionaries or translation services for a single word.
+### ✍️ Content Creation & Sharing
+* **Micro-Posts (Words):** Share short-form text updates, thoughts, and opinions with a strict **500-character limit** to encourage conciseness and clarity.
+* **Multimedia Support:** Easily embed photos, videos (up to 5 minutes), GIFs, and link previews directly into your Words.
+* **Themed Threads:** Go deeper on a subject by linking multiple Words together in a sequential, publicly viewable thread.
+* **Hashtags & Mentions:** Use the `#` symbol for **trending topics** and the `@` symbol to directly **mention** and notify other users, keeping all communication in the public timeline.
+* **Public Polls:** Create quick, engaging polls within a Word to gather transparent community opinions.
 
-### 2. **Enhanced Reading & Language Learning**
-* **Accessibility for Learners:** Provides immediate access to vocabulary definitions, making complex texts more accessible for non-fluent speakers and language students.
-* **Recursive Linking:** When navigating from a "wordlinked" page to a new internal or external page, Wordlink will attempt to process the new page as well, ensuring continuous dictionary access.
-* **Multilingual Support:** The system is designed to generalize across many languages, utilizing various online dictionary resources tailored to the text's language.
+### 🌐 Discovery and Real-Time Interaction
+* **Chronological and Algorithmic Feeds:** Users can switch between a **reverse-chronological feed** of followed accounts or a **curated algorithmic feed** that surfaces popular, trending, and relevant content.
+* **Trending Topics (LinkUp):** A dedicated **"LinkUp"** section highlights the most active, real-time hashtags, discussions, and news stories across the platform.
+* **Public Engagement Tools:**
+    * **Reply:** All replies are public and visible to everyone.
+    * **Re-Word:** Publicly repost a Word to your followers (equivalent to a Retweet).
+    * **Quote Word:** Publicly repost a Word with your own comment added.
+    * **Like:** Express appreciation for a Word.
 
-### 3. **Developer and Author Utility**
+### 🛡️ User and Account Features
+* **Profile Customization:** Personalize your public profile with a bio, profile picture, header image, and pin your most important Word to the top.
+* **Verification Status:** A clear system to distinguish official accounts, businesses, and notable public figures.
+* **Advanced Moderation:** Tools for reporting spam, harassment, and unsafe content are available, along with **user-set keyword filters** to curate your view of the public timeline.
+* **Analytics (Pro Accounts):** Users with Pro accounts get detailed public analytics on their post performance, including impressions, engagement rates, and link clicks.
+
+---
+
+## ⛔ **Important Note: No Private Messaging**
+
+**Wordlink does not support Direct Messages (DMs) or Group Chats.** All communication and interaction on the platform are **strictly public** and viewable by all users. The focus of Wordlink is on the transparent exchange of ideas in the global public square.
+
+---
+
+## 📲 Platform Availability
+
+Wordlink is designed to be accessible wherever you are:
+* **Mobile Apps:** Available on iOS and Android.
+* **Web:** Full-featured desktop browser experience.
 * **Easy Deployment:** Web authors can enable the feature for their readers simply by constructing a special link that points to the Wordlink service, passing the desired language and the target URL as parameters.
 * **Lightweight Solution:** It requires no installation or client-side configuration, making it easy for any reader to use.
 
