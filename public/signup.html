@@ -5,207 +5,233 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wordlink || Sign Up</title>
     <link rel="icon" href="./images/icon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: Arial, sans-serif;
-        background: #f8f8f8;
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        margin: 0;
+        padding: 20px;
         overflow: hidden;
       }
 
       .form-container {
-        background: white;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px #ccc;
-        width: 350px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 24px;
+        padding: 40px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         overflow: hidden;
         position: relative;
       }
 
-      form {
-        overflow: hidden;
+      .logo {
+        text-align: center;
+        margin-bottom: 24px;
       }
 
-      .carousel {
-        display: flex;
-        transition: transform 0.4s ease-in-out;
-      }
-
-      .carousel-page {
-        min-width: 350px;
-        width: 350px;
-        flex-shrink: 0;
-        box-sizing: border-box;
+      .logo img {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 12px;
       }
 
       h2 {
-        margin-top: 0;
-        color: #333;
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+      }
+
+      .subtitle {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 24px;
       }
 
       .progress-bar {
         display: flex;
-        gap: 5px;
-        margin-bottom: 20px;
+        gap: 8px;
+        margin-bottom: 32px;
       }
 
       .progress-step {
         height: 4px;
         flex: 1;
-        background: #e0e0e0;
+        background: rgba(102, 126, 234, 0.2);
         border-radius: 2px;
-        transition: background 0.3s;
+        transition: all 0.3s ease;
       }
 
       .progress-step.active {
-        background: #0A84FF;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .carousel {
+        display: flex;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .carousel-page {
+        min-width: 100%;
+        flex-shrink: 0;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
       }
 
       input {
         width: 100%;
-        padding: 10px;
-        margin: 8px 0;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        box-sizing: border-box;
-        font-size: 14px;
+        padding: 16px 20px;
+        border: 2px solid #e5e7eb;
+        border-radius: 16px;
+        font-size: 16px;
+        background: #ffffff;
+        transition: all 0.3s ease;
+        outline: none;
       }
 
       input:focus {
-        outline: none;
-        border-color: #000;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+      }
+
+      input::placeholder {
+        color: #9ca3af;
       }
 
       .fullname {
         display: flex;
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-between;
-        margin: 8px 0;
-        gap: 8px;
+        gap: 12px;
+        margin-bottom: 20px;
       }
 
       .fullname input {
-        width: 100%;
         flex: 1;
-        margin: 0;
+        margin-bottom: 0;
       }
 
       button {
         width: 100%;
-        padding: 10px;
-        background: #0A84FF;
+        padding: 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border: none;
-        border-radius: 5px;
+        border-radius: 16px;
         color: white;
-        font-weight: bold;
+        font-size: 16px;
+        font-weight: 600;
         cursor: pointer;
-        margin-top: 10px;
+        transition: all 0.3s ease;
+        margin-top: 8px;
       }
 
-      button:hover {
-        background: #365ab8;
+      button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
       }
 
       button:disabled {
         opacity: 0.6;
         cursor: not-allowed;
+        transform: none;
       }
 
       .btn-group {
         display: flex;
-        gap: 10px;
-        margin-top: 10px;
+        gap: 12px;
+        margin-top: 16px;
       }
 
       .btn-secondary {
-        background: #6c757d;
+        background: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+        border: 2px solid #e5e7eb;
       }
 
-      .btn-secondary:hover {
-        background: #5a6268;
+      .btn-secondary:hover:not(:disabled) {
+        background: rgba(108, 117, 125, 0.2);
+        border-color: #6c757d;
+      }
+
+      .helper-text {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 8px;
+        line-height: 1.4;
       }
 
       .msg {
         text-align: center;
-        align-self: center;
-        width: 100%;
-        font-weight: bold;
-        color: red;
-        font-size: 12px;
-        margin-top: 10px;
+        margin-top: 16px;
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 500;
         min-height: 20px;
       }
 
-      .spinner {
-        border: 4px solid rgba(0, 0, 0, 0.1);
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        border-left-color: #0A84FF;
-        animation: spin 1s ease infinite;
+      .msg.error {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+        border: 1px solid rgba(239, 68, 68, 0.2);
       }
 
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
+      .msg.success {
+        background: rgba(34, 197, 94, 0.1);
+        color: #16a34a;
+        border: 1px solid rgba(34, 197, 94, 0.2);
       }
 
-      #loader {
+      .date-inputs {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        background-color: rgba(135, 206, 250, 0.3);
-        margin-top: 20px;
-        padding: 5px 0;
-        border-radius: 5px;
+        gap: 12px;
+        margin-bottom: 20px;
       }
 
-      .submitted:required:invalid {
-        animation: shake 0.2s ease-in-out 0s 2;
-        border-color: #ff4d4d;
-      }
-
-      @keyframes shake {
-        0%, 100% {
-          transform: translateX(0);
-        }
-        25% {
-          transform: translateX(-4px);
-        }
-        75% {
-          transform: translateX(4px);
-        }
+      .date-inputs input {
+        flex: 1;
+        margin-bottom: 0;
+        text-align: center;
       }
 
       .profile-upload {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 15px;
+        gap: 20px;
+        margin-bottom: 24px;
       }
 
       .profile-preview {
         width: 120px;
         height: 120px;
         border-radius: 50%;
-        border: 3px solid #0A84FF;
+        border: 3px solid #667eea;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #f0f0f0;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
         overflow: hidden;
         position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .profile-preview:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
       }
 
       .profile-preview img {
@@ -215,15 +241,17 @@
       }
 
       .profile-preview svg {
-        width: 60px;
-        height: 60px;
-        color: #ccc;
+        width: 50px;
+        height: 50px;
+        color: #667eea;
       }
 
       .upload-btn {
         position: relative;
         overflow: hidden;
-        background: #0A84FF;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 12px 24px;
+        font-size: 14px;
       }
 
       .upload-btn input[type="file"] {
@@ -236,28 +264,71 @@
         cursor: pointer;
       }
 
-      .date-inputs {
-        display: flex;
-        gap: 8px;
-        margin: 8px 0;
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #ffffff;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
       }
 
-      .date-inputs input {
-        flex: 1;
-        margin: 0;
-        padding: 10px 8px;
+      @keyframes spin {
+        to { transform: rotate(360deg); }
       }
 
-      .helper-text {
-        font-size: 12px;
-        color: #666;
-        margin-top: -5px;
-        margin-bottom: 10px;
+      #loader {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(102, 126, 234, 0.1);
+        margin-top: 16px;
+        padding: 16px;
+        border-radius: 12px;
+      }
+
+      .login-link {
+        text-align: center;
+        margin-top: 24px;
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .login-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+      }
+
+      .login-link a:hover {
+        color: #764ba2;
+      }
+
+      @media (max-width: 480px) {
+        .form-container {
+          padding: 24px;
+          margin: 16px;
+        }
+        
+        h2 {
+          font-size: 20px;
+        }
+        
+        .fullname {
+          flex-direction: column;
+          gap: 16px;
+        }
       }
     </style>
   </head>
   <body>
     <div class="form-container">
+      <div class="logo">
+        <img src="./images/icon2.png" alt="WordLink">
+      </div>
+      
       <div class="progress-bar">
         <div class="progress-step active" id="step1"></div>
         <div class="progress-step" id="step2"></div>
@@ -269,25 +340,43 @@
         <div class="carousel" id="carousel">
           <!-- Page 1: Basic Info -->
           <div class="carousel-page" id="page1">
-            <h2>Sign Up</h2>
+            <h2>Create Account</h2>
+            <p class="subtitle">Join WordLink today</p>
+            
             <div class="fullname">
               <input type="text" id="firstname" placeholder="First Name" required />
               <input type="text" id="lastname" placeholder="Last Name" required />
             </div>
-            <input type="text" id="username" placeholder="@username" required />
-            <input type="email" id="email" placeholder="Email" required />
-            <input type="password" id="password" placeholder="Password" required />
-            <div class="helper-text">Min 8 chars, uppercase, lowercase, number & symbol</div>
-            <button type="button" id="nextBtn1">Next</button>
+            
+            <div class="input-group">
+              <input type="text" id="username" placeholder="@username" required />
+            </div>
+            
+            <div class="input-group">
+              <input type="email" id="email" placeholder="Email" required />
+            </div>
+            
+            <div class="input-group">
+              <input type="password" id="password" placeholder="Password" required />
+              <div class="helper-text">Min 8 chars, uppercase, lowercase, number & symbol</div>
+            </div>
+            
+            <button type="button" id="nextBtn1">Continue</button>
+            <div class="msg" id="msg1"></div>
           </div>
 
           <!-- Page 2: Confirm Password -->
           <div class="carousel-page" id="page2">
             <h2>Confirm Password</h2>
-            <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+            <p class="subtitle">Please confirm your password</p>
+            
+            <div class="input-group">
+              <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+            </div>
+            
             <div class="btn-group">
               <button type="button" class="btn-secondary" id="backBtn1">Back</button>
-              <button type="button" id="nextBtn2">Next</button>
+              <button type="button" id="nextBtn2">Continue</button>
             </div>
             <div class="msg" id="msg2"></div>
           </div>
@@ -295,15 +384,17 @@
           <!-- Page 3: Date of Birth -->
           <div class="carousel-page" id="page3">
             <h2>Date of Birth</h2>
+            <p class="subtitle">We need your age for a better experience</p>
+            
             <div class="date-inputs">
               <input type="number" id="day" placeholder="DD" min="1" max="31" required />
               <input type="number" id="month" placeholder="MM" min="1" max="12" required />
               <input type="number" id="year" placeholder="YYYY" min="1900" max="2024" required />
             </div>
-            <div class="helper-text">We need your age to provide a better experience</div>
+            
             <div class="btn-group">
               <button type="button" class="btn-secondary" id="backBtn2">Back</button>
-              <button type="button" id="nextBtn3">Next</button>
+              <button type="button" id="nextBtn3">Continue</button>
             </div>
             <div class="msg" id="msg3"></div>
           </div>
@@ -311,6 +402,8 @@
           <!-- Page 4: Profile Picture -->
           <div class="carousel-page" id="page4">
             <h2>Profile Picture</h2>
+            <p class="subtitle">Add a photo to personalize your profile</p>
+            
             <div class="profile-upload">
               <div class="profile-preview" id="profilePreview">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -323,20 +416,27 @@
               </button>
               <div class="helper-text">Optional - You can add this later</div>
             </div>
+            
             <div class="btn-group">
               <button type="button" class="btn-secondary" id="backBtn3">Back</button>
               <button type="button" id="skipBtn">Skip</button>
             </div>
-            <button type="submit" id="submitBtn">Verify</button>
-            <div id="loader" style="display: none">
+            
+            <button type="submit" id="submitBtn">Create Account</button>
+            
+            <div id="loader">
               <div class="spinner"></div>
+              Creating your account...
             </div>
+            
             <div class="msg" id="msg4"></div>
           </div>
         </div>
       </form>
-      <div>Already have an account?? <a href="login.html">Click here to login</a></div>
-      <div class="msg" id="msg1"></div>
+      
+      <div class="login-link">
+        Already have an account? <a href="login.html">Sign in</a>
+      </div>
     </div>
 
     <script>
@@ -362,16 +462,14 @@
           sessionStorage.removeItem("userEmail");
 
           if(verified === "true"){
-              // finally submit the signup form to backend
               submitForm();
           }
       };
 
-
-      // Navigation functions
       function goToPage(pageNum) {
         currentPage = pageNum;
-        carousel.style.transform = `translateX(-${pageNum * 350}px)`;
+        const containerWidth = document.querySelector('.carousel-page').offsetWidth;
+        carousel.style.transform = `translateX(-${pageNum * containerWidth}px)`;
         
         progressSteps.forEach((step, index) => {
           if (index <= pageNum) {
@@ -382,13 +480,11 @@
         });
       }
 
-      // Password strength checker
       function isStrongPassword(password) {
         const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
         return strongRegex.test(password);
       }
 
-      // Validate date
       function isValidDate(day, month, year) {
         const date = new Date(year, month - 1, day);
         return date.getFullYear() === year && 
@@ -396,55 +492,52 @@
                date.getDate() === day;
       }
 
+      function showMessage(msgId, text, isError = true) {
+        const msg = document.getElementById(msgId);
+        msg.textContent = text;
+        msg.className = isError ? "msg error" : "msg success";
+      }
+
       // Page 1: Basic Info
       document.getElementById("username").addEventListener("input", async (e) => {
-        const next = document.getElementById("nextBtn1")
-        const msg = document.getElementById("msg1");
-        const res = await fetch("https://wordlinkapp.onrender.com/api/auths/check", {
+        const next = document.getElementById("nextBtn1");
+        const res = await fetch("https://wordlink.up.railway.app/api/auths/check", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: e.target.value })
           });
 
-          const data = await res.json()
+          const data = await res.json();
           if (!res.ok){
-            msg.innerText = data.message;
-            msg.style.color = "red";
-            msg.style.display = "flex";
+            showMessage("msg1", data.message, true);
             next.disabled = true;
-            return 
-          }else{
-            msg.innerText = ""
+          } else {
+            showMessage("msg1", "", false);
             next.disabled = false;
-            return
           }
-      })
+      });
+
       document.getElementById("nextBtn1").addEventListener("click", () => {
         const firstname = document.getElementById("firstname").value.trim();
         const lastname = document.getElementById("lastname").value.trim();
         const username = document.getElementById("username").value.trim();
         const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value;
-        const msg = document.getElementById("msg1");
 
         const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (!validEmail.test(email)) {
-          msg.style.color = "red";
-          msg.innerText = "Invalid Email format";
+          showMessage("msg1", "Invalid Email format", true);
           return;
         }
 
-
         if (!firstname || !lastname || !username || !email || !password) {
-          msg.style.color = "red";
-          msg.innerText = "Please fill in all fields";
+          showMessage("msg1", "Please fill in all fields", true);
           return;
         }
 
         if (!isStrongPassword(password)) {
-          msg.style.color = "red";
-          msg.innerText = "Password must have 8+ chars, uppercase, lowercase, number & symbol";
+          showMessage("msg1", "Password must have 8+ chars, uppercase, lowercase, number & symbol", true);
           return;
         }
 
@@ -453,7 +546,7 @@
         formData.username = username;
         formData.email = email;
         formData.password = password;
-        msg.innerText = "";
+        showMessage("msg1", "", false);
         sessionStorage.setItem("userEmail", formData.email);
         goToPage(1);
       });
@@ -461,22 +554,19 @@
       // Page 2: Confirm Password
       document.getElementById("nextBtn2").addEventListener("click", () => {
         const confirmPassword = document.getElementById("confirmPassword").value;
-        const msg = document.getElementById("msg2");
 
         if (!confirmPassword) {
-          msg.style.color = "red";
-          msg.innerText = "Please confirm your password";
+          showMessage("msg2", "Please confirm your password", true);
           return;
         }
 
         if (confirmPassword !== formData.password) {
-          msg.style.color = "red";
-          msg.innerText = "Passwords do not match";
+          showMessage("msg2", "Passwords do not match", true);
           return;
         }
 
         formData.confirmPassword = confirmPassword;
-        msg.innerText = "";
+        showMessage("msg2", "", false);
         goToPage(2);
       });
 
@@ -490,30 +580,26 @@
         const day = parseInt(document.getElementById("day").value);
         const month = parseInt(document.getElementById("month").value);
         const year = parseInt(document.getElementById("year").value);
-        const msg = document.getElementById("msg3");
         sessionStorage.setItem("isVerified", "false");
 
         if (!day || !month || !year) {
-          msg.style.color = "red";
-          msg.innerText = "Please enter your complete date of birth";
+          showMessage("msg3", "Please enter your complete date of birth", true);
           return;
         }
 
         if (!isValidDate(day, month, year)) {
-          msg.style.color = "red";
-          msg.innerText = "Please enter a valid date";
+          showMessage("msg3", "Please enter a valid date", true);
           return;
         }
 
         const age = new Date().getFullYear() - year;
         if (age < 13) {
-          msg.style.color = "red";
-          msg.innerText = "You must be at least 13 years old";
+          showMessage("msg3", "You must be at least 13 years old", true);
           return;
         }
 
         formData.dob = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        msg.innerText = "";
+        showMessage("msg3", "", false);
         goToPage(3);
       });
 
@@ -544,66 +630,65 @@
         e.preventDefault();
         if (sessionStorage.getItem("isVerified") === "true"){
           submitForm();
-        }else{
-          // redirect to verify email page
-          const formImage = new FormData()
-          formImage.append("image", formData.profilePic)
-          formImage.append("username", formData.username)
-          formImage.append("firstname", formData.firstname)
-          formImage.append("lastname", formData.lastname)
-          formImage.append("email", formData.email)
-          formImage.append("password", formData.password)
+        } else {
+          const formImage = new FormData();
+          formImage.append("image", formData.profilePic);
+          formImage.append("username", formData.username);
+          formImage.append("firstname", formData.firstname);
+          formImage.append("lastname", formData.lastname);
+          formImage.append("email", formData.email);
+          formImage.append("password", formData.password);
           const dataObj = Object.fromEntries(formImage.entries());
-          // Store in localStorage as JSON
           localStorage.setItem("signupData", JSON.stringify(dataObj));
           sessionStorage.setItem("userEmail", formData.email);
-          console.log("Posting...")
           window.location.href = "verifyEmail.html";
         }
       });
 
       async function submitForm() {
         const loader = document.getElementById("loader");
-        const msg = document.getElementById("msg4");
         const submitBtn = document.getElementById("submitBtn");
         const skipBtn = document.getElementById("skipBtn");
         const storedData = JSON.parse(localStorage.getItem("signupData"));
+        
+        if (!storedData) {
+          showMessage("msg4", "No stored data found.", true);
+          return;
+        }
+        
         const newData = new FormData();
         for (let key in storedData) {
           newData.append(key, storedData[key]);
         }
-        if (newData.profilePic) {
-          newData.append("image", newData.profilePic);
-        }
+        
         try {
           loader.style.display = "flex";
           submitBtn.disabled = true;
           skipBtn.disabled = true;
-          msg.innerText = "";
-          if (!storedData) {
-            return console.log("No stored data found.");
-          }
-          const res = await fetch("https://wordlinkapp.onrender.com/api/auths/signup", {
-          method: "POST",
-          body: newData})
+          showMessage("msg4", "", false);
+          
+          const res = await fetch("https://wordlink.up.railway.app/api/auths/signup", {
+            method: "POST",
+            body: newData
+          });
+          
           const data = await res.json();
-          msg.style.color = res.ok ? "green" : "red";
-          msg.innerText = res.ok ? data.message : `${data.message}`;
-
+          
           if (res.ok) {
-            localStorage.removeItem("formData");
-            window.location.href = "login.html";
+            showMessage("msg4", "Account created successfully! Redirecting...", false);
+            localStorage.removeItem("signupData");
+            setTimeout(() => {
+              window.location.href = "login.html";
+            }, 2000);
           } else {
-            loader.style.display = "none";
-            localStorage.removeItem("formData");
-            submitBtn.disabled = false;
-            skipBtn.disabled = false;
+            showMessage("msg4", data.message, true);
+            localStorage.removeItem("signupData");
           }
         } catch (error) {
+          showMessage("msg4", "An error occurred. Please try again.", true);
+          localStorage.removeItem("signupData");
+        } finally {
           loader.style.display = "none";
-          msg.style.color = "red";
-          msg.innerText = "An error occurred. Please try again.";
-          localStorage.removeItem("formData");
           submitBtn.disabled = false;
           skipBtn.disabled = false;
         }
