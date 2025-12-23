@@ -400,7 +400,7 @@
       document.getElementById("username").addEventListener("input", async (e) => {
         const next = document.getElementById("nextBtn1")
         const msg = document.getElementById("msg1");
-        const res = await fetch("https://wordlink.up.railway.app/api/auths/check", {
+        const res = await fetch("https://wordlinkapp.onrender.com/api/auths/check", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: e.target.value })
@@ -583,7 +583,7 @@
           if (!storedData) {
             return console.log("No stored data found.");
           }
-          const res = await fetch("https://wordlink.up.railway.app/api/auths/signup", {
+          const res = await fetch("https://wordlinkapp.onrender.com/api/auths/signup", {
           method: "POST",
           body: newData})
           const data = await res.json();

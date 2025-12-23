@@ -1,5 +1,5 @@
 <!doctype html>
-<html langs"en">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
@@ -92,6 +92,11 @@
     justify-content:center;
     cursor:pointer;
     transition:all 0.2s;
+  }
+
+  #page-3{
+    overflow-y: auto;
+    max-height: 400px;
   }
   
   .menu-btn:hover{
@@ -567,7 +572,7 @@
       if (!postId) {
         return window.location.href = 'clients.html';
       }
-      const res = await fetch(`https://wordlink.up.railway.app/api/posts/${postId}`, {
+      const res = await fetch(`https://wordlinkapp.onrender.com/api/posts/${postId}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}`},
       });
@@ -667,7 +672,7 @@
         postBtn.textContent = 'Posting...';
         postBtn.disabled = true;
         
-        const res = await fetch(`https://wordlink.up.railway.app/api/posts/${postId}`, {
+        const res = await fetch(`https://wordlinkapp.onrender.com/api/posts/${postId}`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`, // send token to backend

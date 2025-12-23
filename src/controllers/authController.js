@@ -3,7 +3,7 @@ import Otp from "../models/OtpModel.js"
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from 'cloudinary';
-import nodemailer from "nodemailer";
+import { Resend } from 'resend';
 
 // Get all posts
 export const getProfile = async (req, res) => {
