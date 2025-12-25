@@ -1,14 +1,14 @@
-# Node.js Express template
+Wordlink is a modern social media platform designed for minimalist networking. Built with a focus on speed, Wordlink allows users to share, discover, and interact in a streamlined environment.
 
-This is a Node.js Express project with an HTTP server.
+##✨ Features
+Dynamic Feed: Real-time updates from people you follow.
+User Profiles: Customizable profiles with bios, avatars, and post history.
+Interactions: Like, comment, and "link" (repost) content across the network.
+Responsive Design: Fully optimized for mobile, tablet, and desktop viewing.
 
-Add your [configuration](https://codesandbox.io/docs/projects/learn/setting-up/tasks) to optimize it for [CodeSandbox](https://codesandbox.io).
-
-## How does this work?
-
-We run `yarn start` to start an HTTP server that runs on http://localhost:8080. You can open new or existing devtools with the + button next to the devtool tabs.
-
-## Resources
-
-- [CodeSandbox — Docs](https://codesandbox.io/docs)
-- [CodeSandbox — Community](https://codesandbox.community)
+##🚀 Tech Stack
+Frontend: Static Html
+Backend: Node.js
+Database:  MongoDB
+Real-time: Socket.io / WebSockets(Coming soon)
+Authentication: JWT 
