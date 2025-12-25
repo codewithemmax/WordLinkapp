@@ -4,68 +4,275 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordlink Post Detail</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
     <link rel="icon" href="./images/icon.png" type="image/x-icon">
     <style>
+        :root{
+            --bg: #ffffff;
+            --muted: #f1f5f9;
+            --accent: #0A84FF;
+            --accent-hover: #0070e0;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: rgba(15,23,42,0.08);
+            --glow: rgba(10,132,255,0.15);
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            background-color: #f7f9fb;
-            overflow-y: auto;
+            margin: 0;
+            padding: 20px;
+            background-color: white;
         }
 
-        .post-section {
-            width: 100%;
+        .post-container {
             max-width: 600px;
-            padding: 1rem;
-            margin-top: 1rem;
-            padding-bottom: 100px;
+            margin: 0 auto;
         }
 
-        .icon-btn { transition: color 0.2s, transform 0.1s; }
-        .icon-btn:hover { color: #1d9bf0; transform: scale(1.05); }
-        
-        .like-btn.liked { fill: #ef4444; stroke: #ef4444; }
-        .like-btn:hover { fill: #fca5a5; stroke: #fca5a5; }
+        .post-card {
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 20px;
+        }
 
-        .reply-line {
-            border-left: 2px solid #e5e7eb;
-            margin-left: 10px;
-            padding-left: 15px;
+        .post-header {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .post-profile {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .post-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .post-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 13px;
+        }
+
+        .post-text span:first-of-type {
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .post-text span:last-of-type {
+            color: grey;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .content {
+            margin-top: 30px;
+            font-size: 14px;
+            line-height: 1.5;
+            font-family: 'Inter', sans-serif;
+            color: #333;
+        }
+
+        .post-image {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .post-date {
+            font-size: 12px;
+            color: grey;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .post-tail {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-top: 10px;
+        }
+
+        .post-tail svg {
+            font-size: 20px;
+            width: 1em;
+            height: 1em;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .post-tail svg:active {
+            transform: scale(0.9);
+        }
+
+        .post-tail svg:hover {
+            color: #0A84FF;
+        }
+
+        .post-tail span {
+            font-size: 12px;
+            font-family: 'Inter', sans-serif;
+            margin-right: 8px;
+        }
+
+        .seperator {
+            height: 1px;
+            width: 100%;
+            background-color: #e0e0e0;
+            margin: 10px 5px;
+        }
+
+        .comments-section {
+            margin-top: 20px;
+        }
+
+        .comments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .comments-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .comment-count {
+            font-size: 12px;
+            color: grey;
+        }
+
+        .comment {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .comment-header img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .comment-date {
+            font-size: 10px;
+            color: grey;
+        }
+
+        .comment-text {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .comment-input {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comment-input img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        .comment-input textarea {
+            flex: 1;
+            border: none;
+            outline: none;
+            resize: none;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .comment-input button {
+            background: #0A84FF;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+        }
+
+        #like-btn.liked {
+            fill: #ef4444;
+            stroke: #ef4444;
+        }
+        
+        #like-btn:hover {
+            fill: #fca5a5;
+            stroke: #fca5a5;
         }
     </style>
 </head>
 <body>
-    <div class="post-section">
-        <div id="post-container">
-            <div class="text-center p-8 text-gray-500">Loading post...</div>
+    <div class="post-container">
+        <div id="post-content">
+            <div style="text-align: center; padding: 40px; color: #666;">Loading post...</div>
         </div>
-
-        <div class="mt-6 mb-4 flex items-center justify-between">
-            <h3 class="text-lg font-bold text-gray-800">Comments</h3>
-            <span class="text-sm text-gray-500" id="comment-count-display">0 comments</span>
-        </div>
-
-        <div id="comments-list" class="space-y-4">
+        
+        <div class="comments-section">
+            <div class="comments-header">
+                <h3>Comments</h3>
+                <span class="comment-count" id="comment-count">0 comments</span>
             </div>
+            <div id="comments-list"></div>
+        </div>
     </div>
 
-    <div class="flex fixed bottom-5 left-1/2 transform -translate-x-1/2 w-11/12 max-w-lg bg-white p-3 rounded-xl shadow-2xl border border-gray-200 items-center z-50">
-        <img id="current-user-pic" 
-             src="./images/profile1.webp" 
-             onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'" 
-             class="w-8 h-8 rounded-full border border-gray-200 object-cover">
-        
-        <textarea id="comment-input"
-            class="flex-1 h-10 max-h-24 rounded-full ml-3 px-4 py-2 text-sm border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none transition-all" 
-            placeholder="Add a comment..."></textarea>
-            
-        <button onclick="submitComment()" class="ml-2 p-2 bg-blue-500 rounded-full hover:bg-blue-600 text-white transition transform active:scale-95">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 -rotate-45 relative left-[-1px] top-[1px]">
+    <div class="comment-input">
+        <img id="current-user-pic" src="./images/profile1.webp" alt="User">
+        <textarea id="comment-text" placeholder="Add a comment..." rows="1"></textarea>
+        <button onclick="submitComment()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
             </svg>
         </button>
@@ -74,14 +281,16 @@
     <script>
         let currentPost = null;
         const token = localStorage.getItem('token');
-        const BASE_URL = "https://wordlinkapp.onrender.com/api"; 
+        const BASE_URL = "https://wordlinkapp.onrender.com/api";
 
         window.onload = function() {
-            const postId = sessionStorage.getItem('currentPostId');
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('postId') || sessionStorage.getItem('currentPostId');
+            
             if(postId) {
                 fetchAndRenderPost(postId);
             } else {
-                document.getElementById('post-container').innerHTML = `<div class="text-center text-red-500 mt-10">No post selected. Go back.</div>`;
+                document.getElementById('post-content').innerHTML = '<div style="text-align: center; padding: 40px; color: #dc2626;">No post selected</div>';
             }
         };
 
@@ -93,184 +302,80 @@
                 
                 if (!res.ok) throw new Error("Failed to load post");
                 
-                currentPost = await res.json(); 
-                
-                renderPostCard();
-                renderCommentsList();
+                currentPost = await res.json();
+                renderPost();
+                renderComments();
             } catch (err) {
-                console.error(err);
-                document.getElementById('post-container').innerHTML = `<div class="text-center text-red-500">Error loading post.</div>`;
+                document.getElementById('post-content').innerHTML = '<div style="text-align: center; padding: 40px; color: #dc2626;">Error loading post</div>';
             }
         }
 
-        function renderPostCard() {
-            const container = document.getElementById('post-container');
+        function renderPost() {
+            const container = document.getElementById('post-content');
             const formattedDate = new Date(currentPost.createdAt).toLocaleString();
             
-            // Generate fallback for main post author
-            const authorPic = currentPost.profilePic || `https://ui-avatars.com/api/?name=${currentPost.username}&background=random`;
-
             container.innerHTML = `
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                    <div class="flex items-center mb-4">
-                        <img src="${authorPic}" 
-                             onerror="this.src='https://ui-avatars.com/api/?name=Error'"
-                             class="w-12 h-12 rounded-full mr-3 border object-cover">
-                        <div>
-                            <h4 class="font-bold text-gray-900">${currentPost.fullname || currentPost.username}</h4>
-                            <p class="text-xs text-gray-500">@${currentPost.username} • ${formattedDate}</p>
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-profile">
+                            <img src="${currentPost.profilePic || './images/profile1.webp'}" alt="Profile" />
+                            <div class="post-text">
+                                <span>${currentPost.fullname || currentPost.username}</span>
+                                <span>${currentPost.username}</span>
+                            </div>
                         </div>
                     </div>
-
-                    <p class="text-gray-800 text-base leading-relaxed mb-3">${currentPost.content}</p>
-                    ${currentPost.imageUrl ? `<img src="${currentPost.imageUrl}" class="w-full rounded-xl mb-3 shadow-sm object-cover">` : ''}
-
-                    <div class="flex items-center justify-between pt-3 border-t border-gray-100 text-gray-500 text-sm">
-                        <button onclick="toggleLike()" class="flex items-center space-x-2 hover:text-red-500 transition">
-                            <svg class="w-5 h-5 like-btn ${currentPost.isLiked ? 'liked' : ''}" 
-                                 fill="${currentPost.isLiked ? 'red' : 'none'}" 
-                                 stroke="${currentPost.isLiked ? 'red' : 'currentColor'}" 
-                                 viewBox="0 0 24 24" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                            </svg>
-                            <span>${currentPost.likes}</span>
-                        </button>
-                        <span>${currentPost.comments.length} Comments</span>
+                    <div class="content">
+                        <span>${currentPost.content}</span>
+                        ${currentPost.imageUrl ? `<img class="post-image" src="${currentPost.imageUrl}" alt="Post image"/>` : ""}
                     </div>
+                    ${currentPost.updatedAt ? `<div class="post-date">${formattedDate}</div>` : ""}
+                    <div class="post-tail">
+                        <svg id="like-btn" onclick="toggleLike()" class="${currentPost.isLiked ? 'liked' : ''}" 
+                             fill="${currentPost.isLiked ? 'red' : 'none'}" 
+                             stroke="${currentPost.isLiked ? 'red' : 'currentColor'}" 
+                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                        </svg>
+                        <span>${currentPost.likes}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
+                        </svg>
+                        <span>${currentPost.comments.length}</span>
+                    </div>
+                    <div class="seperator"></div>
                 </div>
             `;
-            
-            document.getElementById('comment-count-display').innerText = `${currentPost.comments.length} comments`;
         }
 
-        function renderCommentsList() {
+        function renderComments() {
             const list = document.getElementById('comments-list');
-            list.innerHTML = "";
-
+            const count = document.getElementById('comment-count');
+            
+            count.textContent = `${currentPost.comments.length} comments`;
+            
             if (!currentPost.comments || currentPost.comments.length === 0) {
-                list.innerHTML = `<div class="text-center text-gray-400 py-10">No comments yet. Be the first!</div>`;
+                list.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">No comments yet</div>';
                 return;
             }
 
-            [...currentPost.comments].reverse().forEach(comment => {
-                // --- SAFE USER CHECK ---
-                const safeUser = comment.userId; // Handles null users
-                
-                const hasReplies = comment.replies && comment.replies.length > 0;
-                const replyCount = hasReplies ? comment.replies.length : 0;
-                
-                let repliesHtml = '';
-                let toggleButtonHtml = '';
-
-                if (hasReplies) {
-                    const firstReply = comment.replies[0];
-                    const safeReplyUser = firstReply.userId;
-                    const firstReplyDate = new Date(firstReply.createdAt).toLocaleString();
-                    
-                    repliesHtml += `
-                        <div class="reply-line mt-3">
-                            <div class="flex items-start">
-                                <img src="${safeReplyUser.profilePic}" 
-                                     onerror="this.src='https://ui-avatars.com/api/?name=Error'"
-                                     class="w-6 h-6 rounded-full mr-2 mt-1 object-cover">
-                                <div class="bg-gray-50 p-2 rounded-lg w-full">
-                                    <div class="flex justify-between items-baseline">
-                                        <span class="font-semibold text-xs text-gray-800">${safeReplyUser.username}</span>
-                                        <span class="text-[5px] text-gray-400">${firstReplyDate}</span>
-                                    </div>
-                                    <p class="text-sm text-gray-700 mt-1">${firstReply.text}</p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-                    if (replyCount > 1) {
-                        const remainingCount = replyCount - 1;
-                        let hiddenRepliesHtml = '<div id="replies-hidden-' + comment._id + '" class="hidden">';
-                        
-                        for (let i = 1; i < comment.replies.length; i++) {
-                            const reply = comment.replies[i];
-                            const safeHiddenReplyUser = reply.userId;
-                            const rDate = new Date(reply.createdAt).toLocaleString();
-                            
-                            hiddenRepliesHtml += `
-                                <div class="reply-line mt-2">
-                                    <div class="flex items-start">
-                                        <img src="${safeHiddenReplyUser.profilePic}" 
-                                             onerror="this.src='https://ui-avatars.com/api/?name=Error'"
-                                             class="w-6 h-6 rounded-full mr-2 mt-1 object-cover">
-                                        <div class="bg-gray-50 p-2 rounded-lg w-full">
-                                            <div class="flex justify-between items-baseline">
-                                                <span class="font-semibold text-xs text-gray-800">${safeHiddenReplyUser.username}</span>
-                                                <span class="text-[10px] text-gray-400">${rDate}</span>
-                                            </div>
-                                            <p class="text-sm text-gray-700 mt-1">${reply.text}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        }
-                        hiddenRepliesHtml += '</div>';
-                        repliesHtml += hiddenRepliesHtml;
-
-                        toggleButtonHtml = `
-                            <button onclick="toggleReplies('${comment._id}', ${remainingCount})" 
-                                id="btn-toggle-${comment._id}"
-                                class="ml-8 mt-2 text-xs font-semibold text-blue-500 hover:underline flex items-center">
-                                <span class="mr-1">___</span> View ${remainingCount} more replies
-                            </button>
-                        `;
-                    }
-                }
-
-                const commentDate = new Date(comment.createdAt).toLocaleString();
-                const commentHtml = `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 transition hover:shadow-md">
-                        <div class="flex items-start">
-                            <img src="${safeUser.profilePic}" 
-                                 onerror="this.src='https://ui-avatars.com/api/?name=Error'"
-                                 class="w-10 h-10 rounded-full mr-3 border border-gray-100 object-cover">
-                            <div class="flex-1">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <span class="font-bold text-sm text-gray-900">${safeUser.username}</span>
-                                        <span class="text-[10px] text-gray-400 ml-2">${commentDate}</span>
-                                    </div>
-                                </div>
-                                <p class="text-gray-800 text-sm mt-1 leading-relaxed">${comment.text}</p>
-                                
-                                <div class="flex gap-4 mt-2">
-                                    <button class="text-xs text-gray-500 font-medium hover:text-blue-500">Reply</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-2">
-                            ${repliesHtml}
-                            ${toggleButtonHtml}
-                        </div>
+            list.innerHTML = currentPost.comments.map(comment => `
+                <div class="comment">
+                    <div class="comment-header">
+                        <img src="${comment.userId.profilePic || './images/profile1.webp'}" alt="User">
+                        <span class="comment-author">${comment.userId.username}</span>
+                        <span class="comment-date">${new Date(comment.createdAt).toLocaleString()}</span>
                     </div>
-                `;
-                list.innerHTML += commentHtml;
-            });
-        }
-
-        function toggleReplies(commentId, count) {
-            const hiddenDiv = document.getElementById(`replies-hidden-${commentId}`);
-            const btn = document.getElementById(`btn-toggle-${commentId}`);
-            if (hiddenDiv.classList.contains('hidden')) {
-                hiddenDiv.classList.remove('hidden');
-                btn.innerHTML = `<span class="mr-1">___</span> Hide replies`;
-            } else {
-                hiddenDiv.classList.add('hidden');
-                btn.innerHTML = `<span class="mr-1">___</span> View ${count} more replies`;
-            }
+                    <div class="comment-text">${comment.text}</div>
+                </div>
+            `).join('');
         }
 
         async function submitComment() {
-            const input = document.getElementById('comment-input');
+            const input = document.getElementById('comment-text');
             const text = input.value.trim();
             if (!text) return;
+            
             try {
                 const res = await fetch(`${BASE_URL}/posts/${currentPost._id}/comment`, {
                     method: 'POST',
@@ -278,27 +383,31 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ text: text })
+                    body: JSON.stringify({ text })
                 });
+                
                 if (res.ok) {
-                    input.value = ""; 
-                    fetchAndRenderPost(currentPost._id); 
-                } else {
-                    alert("Failed to post comment");
+                    input.value = "";
+                    fetchAndRenderPost(currentPost._id);
                 }
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                console.error(err);
+            }
         }
 
         async function toggleLike() {
-             currentPost.isLiked = !currentPost.isLiked;
-             currentPost.likes += currentPost.isLiked ? 1 : -1;
-             renderPostCard(); 
-             try {
-                await fetch(`${BASE_URL}/posts/${currentPost._id}/like`, {
+            try {
+                const res = await fetch(`${BASE_URL}/posts/${currentPost._id}/like`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-             } catch(e) { console.error(e); }
+                
+                if (res.ok) {
+                    fetchAndRenderPost(currentPost._id);
+                }
+            } catch (err) {
+                console.error(err);
+            }
         }
     </script>
 </body>

@@ -6,7 +6,10 @@ import {
   deletePost,
   updatePost,
   likePost,
-  commentPost
+  commentPost,
+  bookmarkPost,
+  retweetPost,
+  followUser
 } from "../controllers/postController.js";
 import { optionalAuthenticateToken, authenticateToken } from "../middleware/authMiddleware.js";
 import multer from 'multer'
@@ -23,5 +26,8 @@ router.put("/:id", authenticateToken, upload.single('image'), updatePost);
 router.delete("/:id", authenticateToken, deletePost);
 router.post("/:id/like", authenticateToken, likePost);
 router.post("/:id/comment", authenticateToken, commentPost);
+router.post("/:id/bookmark", authenticateToken, bookmarkPost);
+router.post("/:id/retweet", authenticateToken, retweetPost);
+router.post("/follow/:userId", authenticateToken, followUser);
 
 export default router;

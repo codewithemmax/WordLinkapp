@@ -1,5 +1,5 @@
-// ...existing code...
 import Post from "../models/PostModel.js";
+import User from "../models/UserModel.js";
 import fs from "fs";
 import { v2 as cloudinary } from 'cloudinary';
 cloudinary.config({
@@ -100,9 +100,15 @@ export const getPosts = async (req, res) => {
   try {
     const userId = req.user?.id
     const posts = await Post.find();
+    
+    let currentUser = null;
+    if (userId) {
+      currentUser = await User.findById(userId);
+    }
 
     const formatted = posts.map(post => ({
       _id: post._id,
+      userId: post.userId,
       username: post.username,
       fullname: post.fullname,
       content: post.content,
@@ -113,7 +119,8 @@ export const getPosts = async (req, res) => {
       updatedAt: post.updatedAt,
       isUserPost: post.userId ? post.userId.toString() === userId : false,
       profilePic: post.profilePic,
-      isLiked: userId ? post.likedBy.includes(userId) : false // 👈 key part
+      isLiked: userId ? post.likedBy.includes(userId) : false,
+      isFollowing: currentUser ? currentUser.followings.includes(post.userId) : false
     }));
 
     return res.json(formatted);
@@ -353,6 +360,86 @@ export const updatePost = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error while updating post." });
+  }
+};
+
+// Bookmark post
+export const bookmarkPost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.user.id;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const isBookmarked = user.bookmarks.includes(postId);
+
+    if (isBookmarked) {
+      user.bookmarks = user.bookmarks.filter(id => id.toString() !== postId);
+    } else {
+      user.bookmarks.push(postId);
+    }
+
+    await user.save();
+    res.json({ message: isBookmarked ? "Removed from bookmarks" : "Added to bookmarks" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Retweet post
+export const retweetPost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.user.id;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const isRetweeted = user.retweets.includes(postId);
+
+    if (!isRetweeted) {
+      user.retweets.push(postId);
+      await user.save();
+    }
+
+    res.json({ message: "Post retweeted" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Follow user
+export const followUser = async (req, res) => {
+  try {
+    const targetUserId = req.params.userId;
+    const currentUserId = req.user.id;
+
+    if (targetUserId === currentUserId) {
+      return res.status(400).json({ message: "Cannot follow yourself" });
+    }
+
+    const currentUser = await User.findById(currentUserId);
+    const targetUser = await User.findById(targetUserId);
+
+    if (!targetUser) return res.status(404).json({ message: "User not found" });
+
+    const isFollowing = currentUser.followings.includes(targetUserId);
+
+    if (isFollowing) {
+      currentUser.followings = currentUser.followings.filter(id => id.toString() !== targetUserId);
+      targetUser.followers = targetUser.followers.filter(id => id.toString() !== currentUserId);
+    } else {
+      currentUser.followings.push(targetUserId);
+      targetUser.followers.push(currentUserId);
+    }
+
+    await currentUser.save();
+    await targetUser.save();
+
+    res.json({ message: isFollowing ? "Unfollowed user" : "Followed user", isFollowing: !isFollowing });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 };
 

@@ -15,13 +15,13 @@
 
       body {
         font-family: 'Inter', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        backdrop-filter: blur(10px);
         min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 20px;
-        overflow: hidden;
+        overflow-y: auto;
       }
 
       .form-container {
@@ -34,6 +34,7 @@
         max-width: 420px;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         overflow: hidden;
+        height: fit-content;
         position: relative;
       }
 
@@ -76,17 +77,31 @@
       }
 
       .progress-step.active {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0A84FF 0%, #0070e0 100%);
       }
 
       .carousel {
         display: flex;
         transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 300%;
       }
 
       .carousel-page {
-        min-width: 100%;
+        width: 33.333%;
         flex-shrink: 0;
+        box-sizing: border-box;
+      }
+
+      #page1{
+        margin-right: 43px;
+      }
+      #page2{
+        margin-right: 70px;
+        margin-left: 30px;
+      }
+      #page3{
+        margin-right: 90px;
+        margin-left: 20px;
       }
 
       .input-group {
@@ -105,8 +120,8 @@
       }
 
       input:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        border-color: #0A84FF;
+        box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.1);
       }
 
       input::placeholder {
@@ -127,7 +142,7 @@
       button {
         width: 100%;
         padding: 16px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0A84FF 0%, #0070e0 100%);
         border: none;
         border-radius: 16px;
         color: white;
@@ -140,7 +155,7 @@
 
       button:hover:not(:disabled) {
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 10px 25px rgba(10, 132, 255, 0.3);
       }
 
       button:disabled {
@@ -219,11 +234,11 @@
         width: 120px;
         height: 120px;
         border-radius: 50%;
-        border: 3px solid #667eea;
+        border: 3px solid #0A84FF;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        background: linear-gradient(135deg, rgba(10, 132, 255, 0.1), rgba(0, 112, 224, 0.1));
         overflow: hidden;
         position: relative;
         transition: all 0.3s ease;
@@ -231,7 +246,7 @@
 
       .profile-preview:hover {
         transform: scale(1.05);
-        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        box-shadow: 0 10px 25px rgba(10, 132, 255, 0.2);
       }
 
       .profile-preview img {
@@ -243,13 +258,13 @@
       .profile-preview svg {
         width: 50px;
         height: 50px;
-        color: #667eea;
+        color: #0A84FF;
       }
 
       .upload-btn {
         position: relative;
         overflow: hidden;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0A84FF 0%, #0070e0 100%);
         padding: 12px 24px;
         font-size: 14px;
       }
@@ -282,7 +297,7 @@
         display: none;
         align-items: center;
         justify-content: center;
-        background: rgba(102, 126, 234, 0.1);
+        background: rgba(10, 132, 255, 0.1);
         margin-top: 16px;
         padding: 16px;
         border-radius: 12px;
@@ -296,14 +311,14 @@
       }
 
       .login-link a {
-        color: #667eea;
+        color: #0A84FF;
         text-decoration: none;
         font-weight: 600;
         transition: color 0.3s ease;
       }
 
       .login-link a:hover {
-        color: #764ba2;
+        color: #0070e0;
       }
 
       @media (max-width: 480px) {
@@ -333,7 +348,6 @@
         <div class="progress-step active" id="step1"></div>
         <div class="progress-step" id="step2"></div>
         <div class="progress-step" id="step3"></div>
-        <div class="progress-step" id="step4"></div>
       </div>
 
       <form id="signupForm">
@@ -355,7 +369,13 @@
             <div class="input-group">
               <input type="email" id="email" placeholder="Email" required />
             </div>
+
             
+            <div class="input-group">
+              <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+            </div>
+
+                        
             <div class="input-group">
               <input type="password" id="password" placeholder="Password" required />
               <div class="helper-text">Min 8 chars, uppercase, lowercase, number & symbol</div>
@@ -365,24 +385,8 @@
             <div class="msg" id="msg1"></div>
           </div>
 
-          <!-- Page 2: Confirm Password -->
+          <!-- Page 2: Date of Birth -->
           <div class="carousel-page" id="page2">
-            <h2>Confirm Password</h2>
-            <p class="subtitle">Please confirm your password</p>
-            
-            <div class="input-group">
-              <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-            </div>
-            
-            <div class="btn-group">
-              <button type="button" class="btn-secondary" id="backBtn1">Back</button>
-              <button type="button" id="nextBtn2">Continue</button>
-            </div>
-            <div class="msg" id="msg2"></div>
-          </div>
-
-          <!-- Page 3: Date of Birth -->
-          <div class="carousel-page" id="page3">
             <h2>Date of Birth</h2>
             <p class="subtitle">We need your age for a better experience</p>
             
@@ -393,14 +397,14 @@
             </div>
             
             <div class="btn-group">
-              <button type="button" class="btn-secondary" id="backBtn2">Back</button>
-              <button type="button" id="nextBtn3">Continue</button>
+              <button type="button" class="btn-secondary" id="backBtn1">Back</button>
+              <button type="button" id="nextBtn2">Continue</button>
             </div>
-            <div class="msg" id="msg3"></div>
+            <div class="msg" id="msg2"></div>
           </div>
 
-          <!-- Page 4: Profile Picture -->
-          <div class="carousel-page" id="page4">
+          <!-- Page 3: Profile Picture -->
+          <div class="carousel-page" id="page3">
             <h2>Profile Picture</h2>
             <p class="subtitle">Add a photo to personalize your profile</p>
             
@@ -418,7 +422,7 @@
             </div>
             
             <div class="btn-group">
-              <button type="button" class="btn-secondary" id="backBtn3">Back</button>
+              <button type="button" class="btn-secondary" id="backBtn2">Back</button>
               <button type="button" id="skipBtn">Skip</button>
             </div>
             
@@ -429,7 +433,7 @@
               Creating your account...
             </div>
             
-            <div class="msg" id="msg4"></div>
+            <div class="msg" id="msg3"></div>
           </div>
         </div>
       </form>
@@ -468,7 +472,7 @@
 
       function goToPage(pageNum) {
         currentPage = pageNum;
-        const containerWidth = document.querySelector('.carousel-page').offsetWidth;
+        const containerWidth = document.querySelector('.form-container').offsetWidth;
         carousel.style.transform = `translateX(-${pageNum * containerWidth}px)`;
         
         progressSteps.forEach((step, index) => {
@@ -501,7 +505,7 @@
       // Page 1: Basic Info
       document.getElementById("username").addEventListener("input", async (e) => {
         const next = document.getElementById("nextBtn1");
-        const res = await fetch("https://wordlink.up.railway.app/api/auths/check", {
+        const res = await fetch("https://wordlinkapp.onrender.com/api/auths/check", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: e.target.value })
@@ -512,7 +516,25 @@
             showMessage("msg1", data.message, true);
             next.disabled = true;
           } else {
-            showMessage("msg1", "", false);
+            showMessage("msg1", "", true);
+            next.disabled = false;
+          }
+      });
+
+      document.getElementById("email").addEventListener("input", async (e) => {
+        const next = document.getElementById("nextBtn1");
+        const res = await fetch("https://wordlinkapp.onrender.com/api/auths/check-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: e.target.value })
+          });
+
+          const data = await res.json();
+          if (!res.ok){
+            showMessage("msg1", data.message, true);
+            next.disabled = true;
+          } else {
+            showMessage("msg1", "", true);
             next.disabled = false;
           }
       });
@@ -523,6 +545,7 @@
         const username = document.getElementById("username").value.trim();
         const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
 
         const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -531,7 +554,7 @@
           return;
         }
 
-        if (!firstname || !lastname || !username || !email || !password) {
+        if (!firstname || !lastname || !username || !email || !password || !confirmPassword) {
           showMessage("msg1", "Please fill in all fields", true);
           return;
         }
@@ -541,32 +564,47 @@
           return;
         }
 
+        if (confirmPassword !== password) {
+          showMessage("msg1", "Passwords do not match", true);
+          return;
+        }
+
         formData.firstname = firstname;
         formData.lastname = lastname;
         formData.username = username;
         formData.email = email;
         formData.password = password;
-        showMessage("msg1", "", false);
+        formData.confirmPassword = confirmPassword;
+        showMessage("msg1", "", true);
         sessionStorage.setItem("userEmail", formData.email);
         goToPage(1);
       });
 
-      // Page 2: Confirm Password
+      // Page 2: Date of Birth
       document.getElementById("nextBtn2").addEventListener("click", () => {
-        const confirmPassword = document.getElementById("confirmPassword").value;
+        const day = parseInt(document.getElementById("day").value);
+        const month = parseInt(document.getElementById("month").value);
+        const year = parseInt(document.getElementById("year").value);
+        sessionStorage.setItem("isVerified", "false");
 
-        if (!confirmPassword) {
-          showMessage("msg2", "Please confirm your password", true);
+        if (!day || !month || !year) {
+          showMessage("msg2", "Please enter your complete date of birth", true);
           return;
         }
 
-        if (confirmPassword !== formData.password) {
-          showMessage("msg2", "Passwords do not match", true);
+        if (!isValidDate(day, month, year)) {
+          showMessage("msg2", "Please enter a valid date", true);
           return;
         }
 
-        formData.confirmPassword = confirmPassword;
-        showMessage("msg2", "", false);
+        const age = new Date().getFullYear() - year;
+        if (age < 13) {
+          showMessage("msg2", "You must be at least 13 years old", true);
+          return;
+        }
+
+        formData.dob = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        showMessage("msg2", "", true);
         goToPage(2);
       });
 
@@ -575,37 +613,7 @@
         sessionStorage.removeItem("userEmail");
       });
 
-      // Page 3: Date of Birth
-      document.getElementById("nextBtn3").addEventListener("click", () => {
-        const day = parseInt(document.getElementById("day").value);
-        const month = parseInt(document.getElementById("month").value);
-        const year = parseInt(document.getElementById("year").value);
-        sessionStorage.setItem("isVerified", "false");
-
-        if (!day || !month || !year) {
-          showMessage("msg3", "Please enter your complete date of birth", true);
-          return;
-        }
-
-        if (!isValidDate(day, month, year)) {
-          showMessage("msg3", "Please enter a valid date", true);
-          return;
-        }
-
-        const age = new Date().getFullYear() - year;
-        if (age < 13) {
-          showMessage("msg3", "You must be at least 13 years old", true);
-          return;
-        }
-
-        formData.dob = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        showMessage("msg3", "", false);
-        goToPage(3);
-      });
-
-      document.getElementById("backBtn2").addEventListener("click", () => goToPage(1));
-
-      // Page 4: Profile Picture
+      // Page 3: Profile Picture
       document.getElementById("profilePic").addEventListener("change", (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -619,7 +627,7 @@
         }
       });
 
-      document.getElementById("backBtn3").addEventListener("click", () => goToPage(2));
+      document.getElementById("backBtn2").addEventListener("click", () => goToPage(1));
       
       document.getElementById("skipBtn").addEventListener("click", () => {
         formData.profilePic = null;
@@ -652,7 +660,7 @@
         const storedData = JSON.parse(localStorage.getItem("signupData"));
         
         if (!storedData) {
-          showMessage("msg4", "No stored data found.", true);
+          showMessage("msg3", "No stored data found.", true);
           return;
         }
         
@@ -665,9 +673,9 @@
           loader.style.display = "flex";
           submitBtn.disabled = true;
           skipBtn.disabled = true;
-          showMessage("msg4", "", false);
+          showMessage("msg3", "", true);
           
-          const res = await fetch("https://wordlink.up.railway.app/api/auths/signup", {
+          const res = await fetch("https://wordlinkapp.onrender.com/api/auths/signup", {
             method: "POST",
             body: newData
           });
@@ -675,17 +683,17 @@
           const data = await res.json();
           
           if (res.ok) {
-            showMessage("msg4", "Account created successfully! Redirecting...", false);
+            showMessage("msg3", "Account created successfully! Redirecting...", false);
             localStorage.removeItem("signupData");
             setTimeout(() => {
               window.location.href = "login.html";
             }, 2000);
           } else {
-            showMessage("msg4", data.message, true);
+            showMessage("msg3", data.message, true);
             localStorage.removeItem("signupData");
           }
         } catch (error) {
-          showMessage("msg4", "An error occurred. Please try again.", true);
+          showMessage("msg3", "An error occurred. Please try again.", true);
           localStorage.removeItem("signupData");
         } finally {
           loader.style.display = "none";

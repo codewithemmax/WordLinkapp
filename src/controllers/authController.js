@@ -3,7 +3,7 @@ import Otp from "../models/OtpModel.js"
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from 'cloudinary';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 // Get all posts
 export const getProfile = async (req, res) => {
@@ -22,6 +22,17 @@ export const check = async (req, res) => {
   
   if (userN) {
     return res.status(404).json({ message: "Username has already been taken" });
+  }else{
+    return res.status(200).json({ message: "Available" });
+  }
+}
+
+export const checkEmail = async (req, res) => {
+  const { email } = req.body;
+  const userE = await User.findOne({ email: email });
+  
+  if (userE) {
+    return res.status(404).json({ message: "Email has already been registered" });
   }else{
     return res.status(200).json({ message: "Available" });
   }
@@ -47,8 +58,6 @@ export const signUp = async (req, res) => {
       const result = await cloudinary.uploader.upload(imageFile.path, { folder: "wordlink_posts" });
       profilePic = result.secure_url;
     }
-
-    console.log(`${username}, ${firstname}, ${lastname}, ${email}, ${profilePic}`);
 
 
     const passwordHashed = await bcrypt.hash(password, 10);

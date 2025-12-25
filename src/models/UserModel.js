@@ -8,7 +8,9 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true },
     passwordHashed: { type: String, required: true },
     followers: {type: [mongoose.Schema.Types.ObjectId], default: []},
-    followings: {type: [mongoose.Schema.Types.ObjectId], default: []}
+    followings: {type: [mongoose.Schema.Types.ObjectId], default: []},
+    bookmarks: {type: [mongoose.Schema.Types.ObjectId], default: []},
+    retweets: {type: [mongoose.Schema.Types.ObjectId], default: []}
   },
   { timestamps: true }
 );
