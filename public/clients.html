@@ -788,4 +788,578 @@
           viewBox="0 0 24 24"
           fill="currentColor"
           id="post-btn"
-          st
+          style="color: #0A84FF;"
+          class="size-6"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </nav>
+      <section class="post-section">
+      </section>
+    </div>
+    <div class="content-box">Nothing to see here...</div>
+    <div class="loading-overlay" id="loadingWidget">
+      <div class="loading-w">W</div>
+    </div>
+    <div class="custom-box-overlay" id="logoutModal">
+        <div class="custom-box">
+          <div class="custom-box-title">Log Out?</div>
+          <div class="custom-box-message">Are you sure you want to log out of your account?</div>
+          <div class="custom-box-actions">
+            <button class="custom-box-btn cancel" onclick="closeLogoutModal()">Cancel</button>
+            <button class="custom-box-btn confirm" onclick="confirmLogout()">Log Out</button>
+          </div>
+        </div>
+    </div>
+    <div class="custom-box-overlay" id="deleteModal">
+        <div class="custom-box">
+          <div class="custom-box-title">Delete Post?</div>
+          <div class="custom-box-message">Are you sure you want to delete this post? Your will not be able to retrieve it again.</div>
+          <div class="custom-box-actions">
+            <button class="custom-box-btn cancel" onclick="closedeleteModal()">Cancel</button>
+            <button class="custom-box-btn confirm">Delete</button>
+          </div>
+        </div>
+    </div>
+  <script>
+    const logIn = function(){
+        window.location.href = "login.html"
+      }
+    const postDiv = document.querySelector('.post-section')
+    const token = localStorage.getItem('token')
+    const sidebar = document.querySelector('.sidebar')
+    const menu = document.getElementById('menu-icon')
+    const urlParams = new URLSearchParams(window.location.search);
+    const postIdParam = urlParams.get('postId');
+    const placeholder = document.querySelector('.content-box')
+    const loadingWidget = document.getElementById('loadingWidget')
+
+    function showLoading() {
+      loadingWidget.style.display = 'flex';
+    }
+
+    function hideLoading() {
+      loadingWidget.style.display = 'none';
+    }
+
+    // Make hideLoading globally accessible
+    window.hideLoading = hideLoading;
+
+    // Load post in content-box if postId is in URL
+    if (postIdParam && window.innerWidth >= 1024) {
+      showLoading();
+      placeholder.innerHTML = `<iframe src="postview.html?postId=${postIdParam}" style="width:100%; height:100%; border:none; z-index: 10000" onload="window.hideLoading()"></iframe>`;
+    }
+
+    function openPost(event, postId) {
+      const target = event.target
+
+  // If the click happened on (or inside) a button, textarea, SVG (icon), or dropdown
+    if (target.closest('button') || 
+        target.closest('textarea') || 
+        target.closest('svg') || 
+        target.closest('.dropdown-toggle') ||
+        target.closest('.dropdown-menu')) {
+        return; // STOP! Do not open the post.
+    }else{
+      target.style.background = "#f0f0f0"
+    }
+
+
+      if (!postId) return;
+      
+      sessionStorage.setItem("currentPostId", postId);
+      if (window.innerWidth >= 1024) {
+        const newUrl = `${window.location.pathname}?postId=${postId}`;
+        target.style.background = "transparent"
+        window.history.pushState({}, "", newUrl);
+        showLoading();
+        placeholder.innerHTML = `<iframe src="postview.html?postId=${postId}" style="width:100%; height:100%; border:none; z-index: 10000" onload="window.hideLoading()"></iframe>`;
+        return
+      }
+      showLoading();
+      window.location.href = "postview.html?postId=" + postId;
+      target.style.background = "transparent"
+
+    }
+    
+
+    function sharePost(postId) {
+      if (navigator.share) {
+        const url = `${window.location.origin}/clients.html?postId=${postId}`
+        navigator.share({
+          title: "WordLink Post",
+          url: url
+        })
+      } else {
+        navigator.clipboard.writeText(url);
+        alert("Link copied: " + url);
+      }
+    }
+
+    document.querySelector('.custom-box-btn.confirm').addEventListener('click', function(){
+      const postId = sessionStorage.getItem("deletePostId");
+      deletePost(postId);
+      closedeleteModal();
+    });
+
+    const editPost = (postId) => {
+      sessionStorage.setItem("editPostId", postId);
+      window.location.href = "editpost.html";
+    }
+
+    function showdeleteModal(postId) {
+      sessionStorage.setItem("deletePostId", postId);
+      document.getElementById('deleteModal').classList.add('show');
+    }
+    
+    function closedeleteModal() {
+      document.getElementById('deleteModal').classList.remove('show');
+    }
+
+    function closeLogoutModal() {
+      document.getElementById('logoutModal').classList.remove('show');
+    }
+
+    function showLogoutModal() {
+      document.getElementById('logoutModal').classList.add('show');
+    }
+
+    function confirmLogout() {
+      localStorage.removeItem('token');
+      window.location.href = "login.html";
+    }
+  
+    
+    document.getElementById('logoutModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeLogoutModal();
+      }
+    });
+
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closedeleteModal();
+      }
+    });
+
+    const deletePost = async (postId) => {
+
+      const res = await fetch(`https://wordlinkapp.onrender.com/api/posts/${postId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        document.querySelector(`[data-id="${postId}"]`).remove();
+      } else {
+        alert(data.message || "Delete failed");
+      }
+}
+
+
+    function getPostScore(post) {
+      const hoursSincePost = (new Date() - new Date(post.createdAt)) / 3600000; // hours
+      const score = post.likes * 2 + post.comments.length * 3 - hoursSincePost * 0.5;
+      // likes and comments increase score, older posts lose score
+      return score;
+    }
+
+    menu.addEventListener('click', (e) => {
+      sidebar.classList.toggle("active")
+      if (sidebar.classList.contains("active")){
+        menu.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />`
+    }else{
+      menu.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25" />`
+    }})
+    const postBtn = document.querySelector("#post-btn")
+    postBtn.addEventListener('click', (e) => {
+      if (token){
+        window.location.href = "post.html"
+      }else{
+        alert("User not logged in")
+      }
+    })
+    
+postDiv.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.like-btn');
+  if (!btn) return;
+
+  const postCard = btn.closest('.post-card');
+  const postId = postCard.dataset.id;
+  const likesSpan = postCard.querySelector('.likes');
+
+  if (!token) return alert("You must be logged in to like a post");
+
+  const isLiked = btn.getAttribute("fill") === "red";
+  const currentLikes = parseInt(likesSpan.textContent);
+  
+  btn.setAttribute("fill", !isLiked ? "red" : "none");
+  btn.setAttribute("stroke", !isLiked ? "red" : "currentColor");
+  likesSpan.textContent = !isLiked ? currentLikes + 1 : currentLikes - 1;
+
+  try {
+    await fetch(`https://wordlinkapp.onrender.com/api/posts/${postId}/like`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch (err) {
+    btn.setAttribute("fill", isLiked ? "red" : "none");
+    btn.setAttribute("stroke", isLiked ? "red" : "currentColor");
+    likesSpan.textContent = currentLikes;
+  }
+});
+    
+    async function createPost() {
+      const content = document.getElementById("postContent").value.trim();
+      try {
+        if (!token) {
+           return;
+        }
+
+        if (!content || content.trim() === "") {
+          return;
+         }
+
+      const res = await fetch("https://wordlinkapp.onrender.com/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // send token to backend
+        },
+        body: JSON.stringify({ content }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Post created successfully!");
+        document.getElementById("postContent").value = "";
+        loadTimeline(); // reload posts
+      } else {
+        alert(data.message || "Failed to create post");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error while creating post");
+    }
+  }
+    const loadTimeline = async () => {
+      showLoading();
+      postDiv.innerHTML = ""
+
+const response = await fetch("https://wordlinkapp.onrender.com/api/posts", {
+  method: "GET",
+  headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+  }
+  
+});
+    const data = await response.json()
+    /* posts data include  username fullname content likes createdAt likes comments*/
+    if (token){
+      const profileRes = await fetch("https://wordlinkapp.onrender.com/api/auths/profile", {
+      method: "GET",
+      headers: {
+          Authorization: `Bearer ${token}`,
+  }
+  
+});
+    const profileData = await profileRes.json()
+    sidebar.innerHTML = `
+      <div class="sidebar-profile" onclick="openProfile()">
+       <img src=${profileData.profilePic || "./images/profile1.webp"} alt="."/>
+       <p>${profileData.firstname + " " +profileData.lastname}</p>
+       <p>@${profileData.username}</p>
+       <div class="follow">
+        <div class="follows">
+          <span>Following </span>
+          <span>${profileData.followings.length}</span>
+        </div>
+        <div class="follows">
+          <span>Followers</span>
+          <span>${profileData.followers.length}</span>
+        </div>
+       </div>
+     </div>
+     <ul>
+      <li onclick="openCollections()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+</svg>
+ Collections</li>
+      <li onclick="openSavedPosts()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+</svg>
+
+      Saved Post</li>
+      <li onclick="openRetweets()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
+</svg>
+      Retweets</li>
+      <li onclick="openSettings()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a6.759 6.759 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+</svg>
+      Settings</li>
+      <li class="logout"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+</svg>
+ Log out</li>
+     </ul>
+     
+    `
+    sidebar.querySelector(".logout").addEventListener("click", () => {
+    showLogoutModal();
+    });
+    }else{
+      sidebar.innerHTML = `<div class="sidebar-notlogin">
+      <img src="./images/loginimage.png" alt="."/>
+      <button class="login", onclick=logIn()>Click here to login</button>
+      </div>`
+    }
+
+    if (data){
+      const sortedPosts = data
+  .map(post => ({ ...post, score: getPostScore(post) }))
+  .sort((a, b) => b.score - a.score); // highest score firs
+
+    sortedPosts.forEach((posts) => {
+      postDiv.innerHTML += `
+         <div class="post-card" onclick="openPost(event,'${posts._id}')" data-id=${posts._id}>
+            <div class="post-header">
+              <div class="post-profile">
+                <img src=${posts.profilePic || "./images/profile1.webp "} alt="." />
+                <div class="post-text">
+                  <span>${posts.fullname}</span>
+                  <span>${posts.username}</span>
+                </div>
+              </div>
+              <div class="dropdown">
+                <svg class="size-6 dropdown-toggle" - data-bs-toggle="dropdown" aria-expanded="false" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+                </svg>
+                <ul class="dropdown-menu">
+                  ${!posts.isUserPost ? `<li><button class="dropdown-item follow-btn" 
+                      data-user-id="${posts.userId}" 
+                      data-username="${posts.username}">
+                      ${posts.isFollowing ? `Unfollow @${posts.username}` : `Follow @${posts.username}`}
+                    </button>
+                  </li>` : ""}
+                  ${posts.isUserPost ? `<li><button class="dropdown-item" type="button" onclick="editPost('${posts._id}')">Edit Post</button></li>` : ""}
+                  ${posts.isUserPost ? `<li><button class="dropdown-item w-full text-left text-sm text-red-600 hover:bg-red-50 hover:white" type="button" onclick="showdeleteModal('${posts._id}')">Delete Post</button></li>` : ""}
+                </ul>
+              </div>
+
+
+            </div>
+            <div class="post-content" style={"margin-top: 10px;"}>
+              <span class="content">${posts.content}</span>  
+              ${posts.content.length > 300 ? `<button class="readmore">Read More</button>` : ""}
+              ${posts.imageUrl ? `<img class="post-image" src="${posts.imageUrl}" alt="image"/>` : ""}
+            </div>
+            ${posts.updatedAt ? `<div class="post-date">${new Date(posts.updatedAt).toLocaleString()}</div>`: ""}
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div class="post-tail">
+                <svg
+                class="like-btn size-6"
+                stroke="${posts.isLiked ? 'red' : 'currentColor'}"
+                fill="${posts.isLiked ? 'red' : 'none'}"
+                xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" 
+                    stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                    </svg>
+                <span class="likes">${posts.likes}</span>
+                <svg onclick= "openPost(event,'${posts._id}')" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
+                </svg>
+                <span class="comments">${posts.comments.length}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
+                </svg>
+                <span class="retweets" id="retweets-${posts._id}">0</span>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <svg onclick="sharePost('${posts._id}')"style="font-size: 20px; width: 1em;  margin-top: 10px; height: 1em;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                </svg>
+                <svg onclick="bookmarkPost('${posts._id}')" style="font-size: 20px; width: 1em; margin-top: 10px; height: 1em; cursor: pointer;" fill="${posts.isBookmarked ? 'currentColor' : 'none'}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                </svg>
+              </div>
+            </div>
+            
+            <div class="seperator"></div>
+          </div>
+      `
+    })
+    }
+  }
+    loadTimeline()
+    
+    hideLoading();
+    
+    function openProfile() {
+      const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        showLoading();
+        window.location.href = "profileview.html";
+      } else {
+        if (window.innerWidth >= 1024) {
+          showLoading();
+          placeholder.innerHTML = `<iframe src="profileview.html" style="width:100%; height:100%; border:none; z-index: 10000" onload="window.hideLoading()"></iframe>`;
+        } else {
+          showLoading();
+          window.location.href = "profileview.html";
+        }
+      }
+    }
+
+    async function bookmarkPost(postId) {
+      const bookmarkIcon = document.querySelector(`svg[onclick="bookmarkPost('${postId}')"]`);
+      const isBookmarked = bookmarkIcon.getAttribute('fill') === 'currentColor';
+      
+      bookmarkIcon.setAttribute('fill', isBookmarked ? 'none' : 'currentColor');
+      
+      try {
+        const res = await fetch(`https://wordlinkapp.onrender.com/api/posts/${postId}/bookmark`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (!res.ok) {
+          bookmarkIcon.setAttribute('fill', isBookmarked ? 'currentColor' : 'none');
+          alert('Failed to bookmark post');
+        }
+      } catch (err) {
+        bookmarkIcon.setAttribute('fill', isBookmarked ? 'currentColor' : 'none');
+        alert('Network error. Please try again.');
+      }
+    }
+
+    async function retweetPost(postId) {
+      const retweetCount = document.getElementById(`retweets-${postId}`);
+      const currentCount = parseInt(retweetCount.textContent);
+      
+      retweetCount.textContent = currentCount + 1;
+      
+      try {
+        const res = await fetch(`https://wordlinkapp.onrender.com/api/posts/${postId}/retweet`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (!res.ok) {
+          retweetCount.textContent = currentCount;
+          alert('Failed to retweet post');
+        }
+      } catch (err) {
+        retweetCount.textContent = currentCount;
+        alert('Network error. Please try again.');
+      }
+    }
+
+    // Follow functionality
+    document.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('follow-btn')) {
+        const btn = e.target;
+        const userId = btn.dataset.userId;
+        const username = btn.dataset.username;
+        
+        if (!token) return alert('You must be logged in to follow users');
+        
+        const isFollowing = btn.textContent.includes('Unfollow');
+        btn.textContent = isFollowing ? `Follow @${username}` : `Unfollow @${username}`;
+        
+        try {
+          const res = await fetch(`https://wordlinkapp.onrender.com/api/posts/follow/${userId}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          if (!res.ok) {
+            btn.textContent = isFollowing ? `Unfollow @${username}` : `Follow @${username}`;
+            alert('Failed to follow/unfollow user');
+          }
+        } catch (err) {
+          btn.textContent = isFollowing ? `Unfollow @${username}` : `Follow @${username}`;
+          alert('Network error. Please try again.');
+        }
+      }
+    });
+
+    function openCollections() {
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        showLoading();
+        window.location.href = "profileview.html?tab=collections";
+      } else {
+        if (window.innerWidth >= 1024) {
+          showLoading();
+          placeholder.innerHTML = `<iframe src="profileview.html?tab=collections" style="width:100%; height:100%; border:none" onload="window.hideLoading()"></iframe>`;
+        } else {
+          showLoading();
+          window.location.href = "profileview.html?tab=collections";
+        }
+      }
+    }
+
+    function openSavedPosts() {
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        showLoading();
+        window.location.href = "profileview.html?tab=saved";
+      } else {
+        if (window.innerWidth >= 1024) {
+          showLoading();
+          placeholder.innerHTML = `<iframe src="profileview.html?tab=saved" style="width:100%; height:100%; border:none" onload="window.hideLoading()"></iframe>`;
+        } else {
+          showLoading();
+          window.location.href = "profileview.html?tab=saved";
+        }
+      }
+    }
+
+    function openRetweets() {
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        showLoading();
+        window.location.href = "profileview.html?tab=retweets";
+      } else {
+        if (window.innerWidth >= 1024) {
+          showLoading();
+          placeholder.innerHTML = `<iframe src="profileview.html?tab=retweets" style="width:100%; height:100%; border:none" onload="window.hideLoading()"></iframe>`;
+        } else {
+          showLoading();
+          window.location.href = "profileview.html?tab=retweets";
+        }
+      }
+    }
+
+    function openSettings() {
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        showLoading();
+        window.location.href = "settings.html";
+      } else {
+        if (window.innerWidth >= 1024) {
+          showLoading();
+          placeholder.innerHTML = `<iframe src="settings.html" style="width:100%; height:100%; border:none" onload="window.hideLoading()"></iframe>`;
+        } else {
+          showLoading();
+          window.location.href = "settings.html";
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+  </body>
+</html>
