@@ -1128,7 +1128,7 @@ const response = await fetch("https://wordlinkapp.onrender.com/api/posts", {
     if (data){
       const sortedPosts = data
   .map(post => ({ ...post, score: getPostScore(post) }))
-  .sort((a, b) => b.score - a.score); // highest score first
+  .sort((a, b) => b.score - a.score); // highest score firs
 
     sortedPosts.forEach((posts) => {
       postDiv.innerHTML += `
