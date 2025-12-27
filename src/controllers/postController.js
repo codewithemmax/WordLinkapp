@@ -116,10 +116,9 @@ export const getPosts = async (req, res) => {
       comments: post.comments,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-      isUserPost: post.userId ? post.userId.toString() === userId : false,
-      profilePic: post.profilePic,
+      isUserPost: post.user._id.toString() === userId,
       isLiked: userId ? post.likedBy.includes(userId) : false,
-      isFollowing: currentUser ? currentUser.followings.includes(post.userId) : false
+      isFollowing: currentUser ? currentUser.followings.includes(post.user._id) : false
     }));
 
     return res.json(formatted);
@@ -261,16 +260,16 @@ export const getPost = async (req, res) => {
     // 3. Format the final response
     const formatted = {
       _id: post._id,
-      username: post.username,
-      fullname: post.fullname,
+      username: post.user.username,
+      fullname: `${post.user.firstname} ${post.user.lastname}`,
       content: post.content,
       imageUrl: post.imageUrl,
       likes: post.likes,
       comments: formattedComments, // Use our fixed comments array
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-      isUserPost: post.userId ? post.userId.toString() === userId : false,
-      profilePic: post.profilePic,
+      isUserPost: post.user._id.toString() === userId,
+      profilePic: post.user.profilePic,
       isLiked: userId ? post.likedBy.includes(userId) : false
     };
 

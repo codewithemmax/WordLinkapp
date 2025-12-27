@@ -369,9 +369,8 @@
         border: 0;
         font-size: 15px;
         outline: 0;
-        text-decoration: underline;
+        font-weight: bold;
         background: none;
-        color: #0A84FF;
         padding: 2px;
       }
       
@@ -861,6 +860,16 @@
       placeholder.innerHTML = `<iframe src="postview.html?postId=${postIdParam}" style="width:100%; height:100%; border:none; z-index: 10000" onload="window.hideLoading()"></iframe>`;
     }
 
+    function openUserProfile(userId, username) {
+      if (window.innerWidth >= 1024) {
+        showLoading();
+        placeholder.innerHTML = `<iframe src="profileview.html?userId=${userId}" style="width:100%; height:100%; border:none" onload="window.hideLoading()"></iframe>`;
+      } else {
+        showLoading();
+        window.location.href = `profileview.html?userId=${userId}`;
+      }
+    }
+
     function openPost(event, postId) {
       const target = event.target
 
@@ -887,8 +896,7 @@
         placeholder.innerHTML = `<iframe src="postview.html?postId=${postId}" style="width:100%; height:100%; border:none; z-index: 10000" onload="window.hideLoading()"></iframe>`;
         return
       }
-      showLoading();
-      window.location.href = "postview.html?postId=" + postId;
+      // Don't redirect on mobile for postId URLs
       target.style.background = "transparent"
 
     }
@@ -1151,7 +1159,7 @@ const response = await fetch("https://wordlinkapp.onrender.com/api/posts", {
       postDiv.innerHTML += `
          <div class="post-card" onclick="openPost(event,'${posts._id}')" data-id=${posts._id}>
             <div class="post-header">
-              <div class="post-profile">
+              <div class="post-profile" onclick="openUserProfile('${posts.userId}', '${posts.username}')">
                 <img src=${posts.profilePic || "./images/profile1.webp "} alt="." />
                 <div class="post-text">
                   <span>${posts.fullname}</span>
@@ -1382,10 +1390,10 @@ const response = await fetch("https://wordlinkapp.onrender.com/api/posts", {
       const isExpanded = button.textContent === 'Read Less';
       
       if (isExpanded) {
-        contentSpan.textContent = fullText.substring(0, 300) + '...';
+        contentSpan.innerHTML = fullText.substring(0, 300) + '...';
         button.textContent = 'Read More';
       } else {
-        contentSpan.textContent = fullText;
+        contentSpan.innerHTML = fullText;
         button.textContent = 'Read Less';
       }
     }
