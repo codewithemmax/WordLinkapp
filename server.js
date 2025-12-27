@@ -7,7 +7,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import axios from 'axios';
 
-const url = `https://studex-backend-api.onrender.com/healthcheck`; // Create this endpoint
+const url = `https://wordlinkapp.onrender.com/healthcheck`; // Create this endpoint
 const interval = 14 * 60 * 1000; // 14 minutes in milliseconds
 
 function reloadWebsite() {
