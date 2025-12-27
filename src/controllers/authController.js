@@ -198,3 +198,34 @@ export const updateProfile = async (req, res) => {
     return res.status(500).json({ message: "Login error" });
 }
 }
+
+export const logIn = async (req, res) => {
+  const { usernameOrEmail, password } = req.body;
+  const user = await User.findOne({
+    $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+  });
+  if (user) {
+    const confirmPassword = await bcrypt.compare(password, user.passwordHashed);
+
+    if (confirmPassword) {
+      // after verifying password:
+      const token = jwt.sign(
+        {
+          id: user._id,
+          username: user.username,
+          fullname: `${user.firstname} ${user.lastname}`,
+          profilePic: user.profilePic
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      res.json({ token });
+    } else {
+      return res.status(401).json({ message: "Invalid Credentials" });
+    }
+  } else {
+    return res.status(404).json({ message: "Invalid Credentials" });
+  }
+};
+
