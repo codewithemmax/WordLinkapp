@@ -360,6 +360,8 @@
         const token = localStorage.getItem('token');
         const BASE_URL = "https://wordlinkapp.onrender.com/api";
         let currentUser = null;
+        let profileUser = null;
+        let isOwnProfile = false;
 
         window.onload = function() {
             loadProfile();
@@ -367,27 +369,52 @@
 
         async function loadProfile() {
             try {
-                const res = await fetch(`${BASE_URL}/auths/profile`, {
+                const urlParams = new URLSearchParams(window.location.search);
+                const userId = urlParams.get('userId');
+                
+                // Get current user
+                const currentRes = await fetch(`${BASE_URL}/auths/profile`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                currentUser = await currentRes.json();
                 
-                if (!res.ok) throw new Error("Failed to load profile");
+                // If no userId provided or userId matches current user, show own profile
+                if (!userId || userId === currentUser._id) {
+                    profileUser = currentUser;
+                    isOwnProfile = true;
+                } else {
+                    // Load other user's profile
+                    const profileRes = await fetch(`${BASE_URL}/users/${userId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    profileUser = await profileRes.json();
+                    isOwnProfile = false;
+                }
                 
-                currentUser = await res.json();
                 renderProfile();
                 loadPosts();
+                updateTabsVisibility();
             } catch (err) {
                 console.error(err);
             }
         }
 
+        function updateTabsVisibility() {
+            const savedTab = document.querySelector('.tab[onclick="switchTab(\'saved\')"]');
+            if (!isOwnProfile) {
+                savedTab.style.display = 'none';
+            } else {
+                savedTab.style.display = 'block';
+            }
+        }
+
         function renderProfile() {
-            document.getElementById('profilePic').src = currentUser.profilePic || './images/profile1.webp';
-            document.getElementById('profileName').textContent = `${currentUser.firstname} ${currentUser.lastname}`;
-            document.getElementById('profileUsername').textContent = `@${currentUser.username}`;
-            document.getElementById('profileBio').textContent = currentUser.bio || '';
-            document.getElementById('followingCount').textContent = currentUser.followings?.length || 0;
-            document.getElementById('followersCount').textContent = currentUser.followers?.length || 0;
+            document.getElementById('profilePic').src = profileUser.profilePic || './images/profile1.webp';
+            document.getElementById('profileName').textContent = `${profileUser.firstname} ${profileUser.lastname}`;
+            document.getElementById('profileUsername').textContent = `@${profileUser.username}`;
+            document.getElementById('profileBio').textContent = profileUser.bio || '';
+            document.getElementById('followingCount').textContent = profileUser.followings?.length || 0;
+            document.getElementById('followersCount').textContent = profileUser.followers?.length || 0;
         }
 
         async function loadPosts() {
@@ -397,7 +424,7 @@
                 });
                 
                 const posts = await res.json();
-                const userPosts = posts.filter(post => post.username === currentUser.username);
+                const userPosts = posts.filter(post => post.username === profileUser.username);
                 
                 document.getElementById('postsCount').textContent = userPosts.length;
                 renderPosts(userPosts, 'posts');
@@ -435,7 +462,7 @@
                     <div class="post-actions">
                         <div class="post-stats">
                             <div class="post-stat">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg fill="${post.isLiked ? 'red' : 'none'}" stroke="${post.isLiked ? 'red' : 'currentColor'}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                 </svg>
                                 <span>${post.likes}</span>
@@ -447,18 +474,20 @@
                                 <span>${post.comments?.length || 0}</span>
                             </div>
                         </div>
+                        ${isOwnProfile ? `
                         <div class="action-btns">
-                            <button class="action-btn" onclick="savePost('${post._id}')" title="Save">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <button class="action-btn" onclick="bookmarkPost('${post._id}')" title="Bookmark">
+                                <svg fill="${post.isBookmarked ? 'currentColor' : 'none'}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                                 </svg>
                             </button>
                             <button class="action-btn" onclick="retweetPost('${post._id}')" title="Retweet">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg fill="${post.isRetweeted ? 'currentColor' : 'none'}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                 </svg>
                             </button>
                         </div>
+                        ` : ''}
                     </div>
                 </div>
             `).join('');
@@ -484,29 +513,57 @@
         }
 
         async function loadLikedPosts() {
-            // Placeholder - implement based on your backend
-            console.log('Loading liked posts...');
+            try {
+                const res = await fetch(`${BASE_URL}/posts`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const posts = await res.json();
+                const likedPosts = posts.filter(post => post.isLiked);
+                renderPosts(likedPosts, 'liked');
+            } catch (err) {
+                console.error(err);
+            }
         }
 
         async function loadSavedPosts() {
-            // Placeholder - implement based on your backend
-            console.log('Loading saved posts...');
+            if (!isOwnProfile) return;
+            try {
+                const res = await fetch(`${BASE_URL}/posts`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const posts = await res.json();
+                const savedPosts = posts.filter(post => post.isBookmarked);
+                renderPosts(savedPosts, 'saved');
+            } catch (err) {
+                console.error(err);
+            }
         }
 
         async function loadRetweets() {
-            // Placeholder - implement based on your backend
-            console.log('Loading retweets...');
+            try {
+                const res = await fetch(`${BASE_URL}/posts`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const posts = await res.json();
+                const retweetedPosts = posts.filter(post => post.isRetweeted);
+                renderPosts(retweetedPosts, 'retweets');
+            } catch (err) {
+                console.error(err);
+            }
         }
 
-        async function savePost(postId) {
+        async function bookmarkPost(postId) {
             try {
-                const res = await fetch(`${BASE_URL}/posts/${postId}/save`, {
+                const res = await fetch(`${BASE_URL}/posts/${postId}/bookmark`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
                 if (res.ok) {
-                    alert('Post saved!');
+                    alert('Bookmark successful');
+                    // Reload current tab
+                    const activeTab = document.querySelector('.tab.active').textContent.toLowerCase();
+                    if (activeTab === 'saved') loadSavedPosts();
                 }
             } catch (err) {
                 console.error(err);
@@ -521,7 +578,10 @@
                 });
                 
                 if (res.ok) {
-                    alert('Post retweeted!');
+                    alert('Retweet successful');
+                    // Reload current tab
+                    const activeTab = document.querySelector('.tab.active').textContent.toLowerCase();
+                    if (activeTab === 'retweets') loadRetweets();
                 }
             } catch (err) {
                 console.error(err);
