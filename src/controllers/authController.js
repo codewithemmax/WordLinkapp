@@ -170,7 +170,6 @@ export const updateProfile = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
-};
   const { usernameOrEmail, password } = req.body;
   try {
     const user = await User.findOne({
@@ -197,6 +196,5 @@ export const updateProfile = async (req, res) => {
     return res.status(401).json({ message: "Invalid Credentials" });
   } catch (err) {
     return res.status(500).json({ message: "Login error" });
-  }
-};
-        
+}
+}
