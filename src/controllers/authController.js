@@ -135,7 +135,42 @@ export const sendOtp = async (req, res) => {
   }
 };
 
-export const logIn = async (req, res) => {
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { firstname, lastname, username, email, phone, bio } = req.body;
+    const imageFile = req.file;
+
+    let profilePic = null;
+    if (imageFile) {
+      const result = await cloudinary.uploader.upload(imageFile.path, { folder: "wordlink_profiles" });
+      profilePic = result.secure_url;
+    }
+
+    const updateFields = {
+      firstname,
+      lastname, 
+      username,
+      email,
+      phone,
+      bio
+    };
+    
+    if (profilePic) {
+      updateFields.profilePic = profilePic;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, { new: true });
+    
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "Profile updated successfully", user: updatedUser });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
   const { usernameOrEmail, password } = req.body;
   try {
     const user = await User.findOne({

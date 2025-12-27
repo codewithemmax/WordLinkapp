@@ -572,14 +572,14 @@
       if (!postId) {
         return window.location.href = 'clients.html';
       }
-      const res = await fetch(`https://wordlinkapp.onrender.comm/api/posts/${postId}`, {
+      const res = await fetch(`https://wordlinkapp.onrender.com/api/posts/${postId}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}`},
       });
 
       const data = await res.json();
       if (res.ok){
-        textarea.innerText = data.content;
+        textarea.value = data.content;
         const previewImage = document.getElementById('previewImage');
         const uploadContent = document.getElementById('uploadContent');
         const addBox = document.getElementById('addBox');

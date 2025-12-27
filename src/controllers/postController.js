@@ -1,5 +1,6 @@
 import Post from "../models/PostModel.js";
 import User from "../models/UserModel.js";
+import Notification from "../models/NotificationModel.js";
 import fs from "fs";
 import { v2 as cloudinary } from 'cloudinary';
 cloudinary.config({
@@ -432,6 +433,14 @@ export const followUser = async (req, res) => {
     } else {
       currentUser.followings.push(targetUserId);
       targetUser.followers.push(currentUserId);
+      
+      // Create notification
+      await Notification.create({
+        userId: targetUserId,
+        type: 'follow',
+        fromUserId: currentUserId,
+        message: `${currentUser.username} started following you`
+      });
     }
 
     await currentUser.save();

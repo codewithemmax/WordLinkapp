@@ -1,5 +1,5 @@
 import express from "express";
-import { logIn, check, checkEmail, signUp, getProfile, verifyOtp, sendOtp } from "../controllers/authController.js";
+import { logIn, check, checkEmail, signUp, getProfile, verifyOtp, sendOtp, updateProfile } from "../controllers/authController.js";
 import { authenticateToken } from "../middleware/authMiddleware.js";
 import multer from 'multer'
 import { verify } from "crypto";
@@ -17,5 +17,6 @@ router.post("/check", check)
 router.post("/check-email", checkEmail)
 router.post("/verify_otp", verifyOtp)
 router.post("/send_otp", sendOtp)
+router.put("/update-profile", authenticateToken, upload.single('profilePic'), updateProfile)
 
 export default router;
