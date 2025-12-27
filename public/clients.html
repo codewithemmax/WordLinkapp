@@ -940,6 +940,7 @@
 
     function confirmDelete() {
       const postId = sessionStorage.getItem("deletePostId");
+      showLoading();
       deletePost(postId);
       closedeleteModal();
     }

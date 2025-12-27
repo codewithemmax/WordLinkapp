@@ -5,6 +5,20 @@ import cors from "cors";
 
 import path from "path";
 import { fileURLToPath } from "url";
+import axios from 'axios';
+
+const url = `https://studex-backend-api.onrender.com/healthcheck`; // Create this endpoint
+const interval = 14 * 60 * 1000; // 14 minutes in milliseconds
+
+function reloadWebsite() {
+  axios.get(url)
+    .then(() => console.log("Self-ping successful"))
+    .catch((err) => console.error("Self-ping failed:", err.message));
+}
+
+// Start the interval
+setInterval(reloadWebsite, interval);
+
 
 
 const app = express();
@@ -31,3 +45,6 @@ mongoose
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.get('/healthcheck', (req, res) => {
+  res.status(200).send('Server is awake');
+});
