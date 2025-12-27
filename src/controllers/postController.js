@@ -75,12 +75,9 @@ export const createPost = async (req, res) => {
 
     // req.user is set by authenticateToken middleware
     const newPost = new Post({
-      username: req.user.username, // comes from the decoded token
+      user: req.user.id,
       content: text,
-      userId: req.user.id,
       imageUrl: imageUrl,
-      profilePic: req.user.profilePic,
-      fullname: req.user.fullname,
       createdAt: new Date(),
       likes: 0,
       comments: [],
@@ -100,7 +97,7 @@ export const createPost = async (req, res) => {
 export const getPosts = async (req, res) => {
   try {
     const userId = req.user?.id
-    const posts = await Post.find();
+    const posts = await Post.find().populate('user', 'username firstname lastname profilePic');
     
     let currentUser = null;
     if (userId) {
@@ -109,9 +106,10 @@ export const getPosts = async (req, res) => {
 
     const formatted = posts.map(post => ({
       _id: post._id,
-      userId: post.userId,
-      username: post.username,
-      fullname: post.fullname,
+      userId: post.user._id,
+      username: post.user.username,
+      fullname: `${post.user.firstname} ${post.user.lastname}`,
+      profilePic: post.user.profilePic,
       content: post.content,
       imageUrl: post.imageUrl,
       likes: post.likes,
@@ -233,13 +231,14 @@ export const getPost = async (req, res) => {
     // 1. Fetch the post and Populate user details
     const post = await Post.findById(req.params.id)
       .populate({
-        path: "comments.postedBy", // Database uses 'postedBy' for comments
-        select: "username fullname profilePic"
+        path: "comments.postedBy",
+        select: "username firstname lastname profilePic"
       })
       .populate({
-        path: "comments.replies.userId", // Database uses 'userId' for replies
-        select: "username fullname profilePic"
-      });
+        path: "comments.replies.userId",
+        select: "username firstname lastname profilePic"
+      })
+      .populate('user', 'username firstname lastname profilePic');
 
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
@@ -293,7 +292,7 @@ export const deletePost = async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    if (post.userId.toString() !== userId) {
+    if (post.user._id.toString() !== userId) {
       return res.status(403).json({ message: "Not authorized to delete this post" });
     }
 
