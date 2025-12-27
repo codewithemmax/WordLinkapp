@@ -166,9 +166,9 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json({ message: "Profile updated successfully", user: updatedUser });
+    return res.json({ message: "Profile updated successfully", user: updatedUser });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
   const { usernameOrEmail, password } = req.body;
   try {
