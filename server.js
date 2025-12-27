@@ -19,8 +19,6 @@ function reloadWebsite() {
 // Start the interval
 setInterval(reloadWebsite, interval);
 
-
-
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 const __filename = fileURLToPath(import.meta.url);
