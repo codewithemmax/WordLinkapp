@@ -2,13 +2,15 @@ import 'dotenv/config';
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 import path from "path";
 import { fileURLToPath } from "url";
 import axios from 'axios';
 
-const url = `https://wordlinkapp.onrender.com/healthcheck`; // Create this endpoint
-const interval = 14 * 60 * 1000; // 14 minutes in milliseconds
+const url = `https://wordlinkapp.onrender.com/healthcheck`;
+const interval = 14 * 60 * 1000;
 
 function reloadWebsite() {
   axios.get(url)
@@ -16,10 +18,14 @@ function reloadWebsite() {
     .catch((err) => console.error("Self-ping failed:", err.message));
 }
 
-// Start the interval
 setInterval(reloadWebsite, interval);
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server, {
+  cors: { origin: "*" }
+});
+
 app.use(express.urlencoded({ extended: true }));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +34,24 @@ app.use(express.static(__dirname));
 app.use(cors());
 app.use(express.json());
 
-// Import routes the mm
+// Make io available to routes
+app.set('io', io);
+
+// Socket.io connection handling
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  socket.on('join', (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined room`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+// Import routes
 import postRoutes from "./src/routes/postRoutes.js";
 import authRoutes from "./src/routes/authRoutes.js";
 app.use("/api/posts", postRoutes);
@@ -42,7 +65,7 @@ mongoose
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 app.get('/healthcheck', (req, res) => {
   res.status(200).send('Server is awake');
 });

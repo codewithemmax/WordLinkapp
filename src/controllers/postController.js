@@ -16,15 +16,12 @@ if (!process.env.CLOUD_NAME || !process.env.CLOUD_API_KEY || !process.env.CLOUD_
 // inside createPost — replace the image upload block with the following:
 export const createPost = async (req, res) => {
   try {
-    // content is sent from the frontend
     const { text } = req.body;
     const imageFile = req.file;
-    
-    // Validate
+    const io = req.app.get('io');
     
     let imageUrl = null;
     
-    // Upload to Cloudinary if image exists
     if (imageFile) {
       const uploadWithTimeout = (filePath, timeoutMs = 60000) => {
         return new Promise((resolve, reject) => {
@@ -39,7 +36,6 @@ export const createPost = async (req, res) => {
         });
       };
 
-      // retry logic
       const maxRetries = 3;
       let attempt = 0;
       let lastError = null;
@@ -47,33 +43,28 @@ export const createPost = async (req, res) => {
         while (attempt < maxRetries) {
           attempt++;
           try {
-            const result = await uploadWithTimeout(imageFile.path, 60000); // 60s per attempt
+            const result = await uploadWithTimeout(imageFile.path, 60000);
             imageUrl = result.secure_url;
             break;
           } catch (err) {
             lastError = err;
             console.warn(`Upload attempt ${attempt} failed:`, err.message || err);
             if (attempt < maxRetries) {
-              // exponential backoff
               await new Promise(r => setTimeout(r, 500 * Math.pow(2, attempt)));
             }
           }
         }
       } finally {
-        // always clean up temp file
         if (fs.existsSync(imageFile.path)) {
           try { fs.unlinkSync(imageFile.path); } catch (e) { console.warn('Failed to remove temp file', e); }
         }
       }
     }
 
-
-    // Check if content is empty
     if (!text || text.trim() === "") {
       return res.status(400).json({ message: "Post content cannot be empty." });
     }
 
-    // req.user is set by authenticateToken middleware
     const newPost = new Post({
       user: req.user.id,
       content: text,
@@ -84,9 +75,28 @@ export const createPost = async (req, res) => {
     });
 
     await newPost.save();
-    return res
-      .status(201)
-      .json({ message: "Post created successfully!", post: newPost });
+    
+    // Populate user data for real-time broadcast
+    const populatedPost = await Post.findById(newPost._id).populate('user', 'username firstname lastname profilePic');
+    
+    // Emit to all connected clients
+    io.emit('post-created', {
+      _id: populatedPost._id,
+      userId: populatedPost.user._id,
+      username: populatedPost.user.username,
+      fullname: `${populatedPost.user.firstname} ${populatedPost.user.lastname}`,
+      profilePic: populatedPost.user.profilePic,
+      content: populatedPost.content,
+      imageUrl: populatedPost.imageUrl,
+      likes: populatedPost.likes,
+      comments: populatedPost.comments,
+      createdAt: populatedPost.createdAt,
+      isLiked: false,
+      isBookmarked: false,
+      isRetweeted: false
+    });
+    
+    return res.status(201).json({ message: "Post created successfully!", post: newPost });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error while creating post." });
@@ -130,7 +140,8 @@ export const getPosts = async (req, res) => {
 export const likePost = async (req, res) => {
   try {
     const postId = req.params.id;
-    const userId = req.user.id; // from auth middleware
+    const userId = req.user.id;
+    const io = req.app.get('io');
 
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ message: "Post not found" });
@@ -151,6 +162,12 @@ export const likePost = async (req, res) => {
     }
 
     await post.save();
+    
+    io.emit('post-liked', {
+      postId: postId,
+      likes: post.likes,
+      isLiked: !alreadyLiked
+    });
 
     return res.status(200).json({
       message: alreadyLiked ? "Unliked post" : "Liked post",
@@ -164,16 +181,26 @@ export const likePost = async (req, res) => {
 };
 // Add a comment
 export const commentPost = async (req, res) => {
-  const post = await Post.findById(req.params.id);
+  const postId = req.params.id;
+  const io = req.app.get('io');
+  
+  const post = await Post.findById(postId);
   if (!post) return res.status(404).json({ message: "Post not found" });
 
   const { text } = req.body;
-  post.comments.push({
+  const newComment = {
     postedBy: req.user.id,
     text,
     createdAt: new Date(),
-  });
+  };
+  
+  post.comments.push(newComment);
   await post.save();
+  
+  io.emit('comment-added', {
+    postId: postId,
+    comments: post.comments.length
+  });
 
   res.json({ message: "Comment added" });
 };
@@ -429,6 +456,7 @@ export const followUser = async (req, res) => {
   try {
     const targetUserId = req.params.userId;
     const currentUserId = req.user.id;
+    const io = req.app.get('io');
 
     if (targetUserId === currentUserId) {
       return res.status(400).json({ message: "Cannot follow yourself" });
@@ -448,11 +476,16 @@ export const followUser = async (req, res) => {
       currentUser.followings.push(targetUserId);
       targetUser.followers.push(currentUserId);
       
-      // Create notification
       await Notification.create({
         userId: targetUserId,
         type: 'follow',
         fromUserId: currentUserId,
+        message: `${currentUser.username} started following you`
+      });
+      
+      // Emit real-time notification
+      io.to(targetUserId).emit('new-follower', {
+        username: currentUser.username,
         message: `${currentUser.username} started following you`
       });
     }

@@ -830,6 +830,8 @@
           </div>
         </div>
     </div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="./websocket-client.js"></script>
   <script>
     const logIn = function(){
         window.location.href = "login.html"
@@ -842,6 +844,11 @@
     const postIdParam = urlParams.get('postId');
     const placeholder = document.querySelector('.content-box')
     const loadingWidget = document.getElementById('loadingWidget')
+    
+    // Initialize Socket.io
+    const socket = io('https://wordlinkapp.onrender.com');
+    let currentUserId = null;
+
 
     function showLoading() {
       loadingWidget.style.display = 'flex';
