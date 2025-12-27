@@ -1179,8 +1179,8 @@ const response = await fetch("https://wordlinkapp.onrender.com/api/posts", {
 
             </div>
             <div class="post-content" style={"margin-top: 10px;"}>
-              <span class="content">${posts.content}</span>  
-              ${posts.content.length > 300 ? `<button class="readmore">Read More</button>` : ""}
+              <span class="content" data-full="${posts.content}">${posts.content.length > 300 ? posts.content.substring(0, 300) + '...' : posts.content}</span>  
+              ${posts.content.length > 300 ? `<button class="readmore" onclick="toggleReadMore(this)">Read More</button>` : ""}
               ${posts.imageUrl ? `<img class="post-image" src="${posts.imageUrl}" alt="image"/>` : ""}
             </div>
             ${posts.updatedAt ? `<div class="post-date">${new Date(posts.updatedAt).toLocaleString()}</div>`: ""}
@@ -1375,6 +1375,20 @@ const response = await fetch("https://wordlinkapp.onrender.com/api/posts", {
           showLoading();
           window.location.href = "settings.html";
         }
+      }
+    }
+
+    function toggleReadMore(button) {
+      const contentSpan = button.previousElementSibling;
+      const fullText = contentSpan.dataset.full;
+      const isExpanded = button.textContent === 'Read Less';
+      
+      if (isExpanded) {
+        contentSpan.textContent = fullText.substring(0, 300) + '...';
+        button.textContent = 'Read More';
+      } else {
+        contentSpan.textContent = fullText;
+        button.textContent = 'Read Less';
       }
     }
   </script>
