@@ -462,10 +462,10 @@
                     <div class="post-actions">
                         <div class="post-stats">
                             <div class="post-stat">
-                                <svg fill="${post.isLiked ? 'red' : 'none'}" stroke="${post.isLiked ? 'red' : 'currentColor'}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg class="like-btn" fill="${post.isLiked ? 'red' : 'none'}" stroke="${post.isLiked ? 'red' : 'currentColor'}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                 </svg>
-                                <span>${post.likes}</span>
+                                <span class="likes">${post.likes}</span>
                             </div>
                             <div class="post-stat">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -491,6 +491,42 @@
                     </div>
                 </div>
             `).join('');
+            
+            // Add like button event listeners
+            container.addEventListener('click', async (e) => {
+                const btn = e.target.closest('.like-btn');
+                if (!btn) return;
+
+                const postCard = btn.closest('.post-card');
+                const postId = postCard.dataset.id;
+                const likesSpan = postCard.querySelector('.likes');
+
+                if (!token) return alert("You must be logged in to like a post");
+
+                const isLiked = btn.getAttribute("fill") === "red";
+                const currentLikes = parseInt(likesSpan.textContent);
+                
+                btn.setAttribute("fill", !isLiked ? "red" : "none");
+                btn.setAttribute("stroke", !isLiked ? "red" : "currentColor");
+                likesSpan.textContent = !isLiked ? currentLikes + 1 : currentLikes - 1;
+
+                try {
+                    const res = await fetch(`${BASE_URL}/posts/${postId}/like`, {
+                        method: "POST",
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    
+                    if (!res.ok) {
+                        btn.setAttribute("fill", isLiked ? "red" : "none");
+                        btn.setAttribute("stroke", isLiked ? "red" : "currentColor");
+                        likesSpan.textContent = currentLikes;
+                    }
+                } catch (err) {
+                    btn.setAttribute("fill", isLiked ? "red" : "none");
+                    btn.setAttribute("stroke", isLiked ? "red" : "currentColor");
+                    likesSpan.textContent = currentLikes;
+                }
+            });
         }
 
         function switchTab(tabName) {

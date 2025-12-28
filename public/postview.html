@@ -278,10 +278,27 @@
         </button>
     </div>
 
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
         let currentPost = null;
         const token = localStorage.getItem('token');
         const BASE_URL = "https://wordlinkapp.onrender.com/api";
+        
+        // Initialize Socket.io
+        const socket = io('https://wordlinkapp.onrender.com');
+        
+        // Listen for real-time like updates
+        socket.on('post-liked', (data) => {
+            if (currentPost && data.postId === currentPost._id) {
+                const likeBtn = document.getElementById('like-btn');
+                const likesSpan = likeBtn.nextElementSibling;
+                
+                likesSpan.textContent = data.likes;
+                likeBtn.classList.toggle('liked', data.isLiked);
+                likeBtn.setAttribute('fill', data.isLiked ? 'red' : 'none');
+                likeBtn.setAttribute('stroke', data.isLiked ? 'red' : 'currentColor');
+            }
+        });
 
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -303,6 +320,14 @@
                 if (!res.ok) throw new Error("Failed to load post");
                 
                 currentPost = await res.json();
+                
+                // Get current user profile for comment input
+                const profileRes = await fetch(`${BASE_URL}/auths/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const profileData = await profileRes.json();
+                document.getElementById('current-user-pic').src = profileData.profilePic || './images/profile1.webp';
+                
                 renderPost();
                 renderComments();
             } catch (err) {
@@ -396,17 +421,36 @@
         }
 
         async function toggleLike() {
+            const likeBtn = document.getElementById('like-btn');
+            const likesSpan = likeBtn.nextElementSibling;
+            const currentLikes = parseInt(likesSpan.textContent);
+            const isLiked = likeBtn.classList.contains('liked');
+            
+            // Optimistic update
+            likeBtn.classList.toggle('liked');
+            likeBtn.setAttribute('fill', !isLiked ? 'red' : 'none');
+            likeBtn.setAttribute('stroke', !isLiked ? 'red' : 'currentColor');
+            likesSpan.textContent = !isLiked ? currentLikes + 1 : currentLikes - 1;
+            
             try {
                 const res = await fetch(`${BASE_URL}/posts/${currentPost._id}/like`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
-                if (res.ok) {
-                    fetchAndRenderPost(currentPost._id);
+                if (!res.ok) {
+                    // Revert on error
+                    likeBtn.classList.toggle('liked');
+                    likeBtn.setAttribute('fill', isLiked ? 'red' : 'none');
+                    likeBtn.setAttribute('stroke', isLiked ? 'red' : 'currentColor');
+                    likesSpan.textContent = currentLikes;
                 }
             } catch (err) {
-                console.error(err);
+                // Revert on error
+                likeBtn.classList.toggle('liked');
+                likeBtn.setAttribute('fill', isLiked ? 'red' : 'none');
+                likeBtn.setAttribute('stroke', isLiked ? 'red' : 'currentColor');
+                likesSpan.textContent = currentLikes;
             }
         }
     </script>

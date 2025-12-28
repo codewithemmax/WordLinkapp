@@ -127,8 +127,11 @@ export const getPosts = async (req, res) => {
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
       isUserPost: post.user._id.toString() === userId,
-      isLiked: userId ? post.likedBy.includes(userId) : false,
-      isFollowing: currentUser ? currentUser.followings.includes(post.user._id) : false
+      isLiked: userId ? post.likedBy?.includes(userId) : false,
+      isBookmarked: currentUser ? currentUser.bookmarks?.includes(post._id) : false,
+      isRetweeted: currentUser ? currentUser.retweets?.includes(post._id) : false,
+      isFollowing: currentUser ? currentUser.followings?.includes(post.user._id) : false,
+      retweetCount: 0
     }));
 
     return res.json(formatted);

@@ -1060,10 +1060,16 @@ postDiv.addEventListener('click', async (e) => {
   likesSpan.textContent = !isLiked ? currentLikes + 1 : currentLikes - 1;
 
   try {
-    await fetch(`https://wordlinkapp.onrender.com/api/posts/${postId}/like`, {
+    const res = await fetch(`https://wordlinkapp.onrender.com/api/posts/${postId}/like`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });
+    
+    if (!res.ok) {
+      btn.setAttribute("fill", isLiked ? "red" : "none");
+      btn.setAttribute("stroke", isLiked ? "red" : "currentColor");
+      likesSpan.textContent = currentLikes;
+    }
   } catch (err) {
     btn.setAttribute("fill", isLiked ? "red" : "none");
     btn.setAttribute("stroke", isLiked ? "red" : "currentColor");
