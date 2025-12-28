@@ -1221,7 +1221,7 @@ const response = await fetch("https://wordlinkapp.onrender.com/api/posts", {
 
             </div>
             <div class="post-content" style={"margin-top: 10px;"}>
-              <span class="content" data-full="${posts.content.replace(/"/g, '&quot;')}">${posts.content.length > 300 ? posts.content.substring(0, 300) + '...' : posts.content}</span>  
+              <span class="content" style="white-space: pre-wrap;" data-full="${posts.content.replace(/"/g, '&quot;')}">${posts.content.length > 300 ? posts.content.substring(0, 300) + '...' : posts.content}</span>  
               ${posts.content.length > 300 ? `<button class="readmore" onclick="toggleReadMore(this)">Read More</button>` : ""}
               ${posts.imageUrl ? `<img class="post-image" src="${posts.imageUrl}" alt="image"/>` : ""}
             </div>
