@@ -1065,6 +1065,12 @@ postDiv.addEventListener('click', async (e) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     
+    if (res.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+      return;
+    }
+    
     if (!res.ok) {
       btn.setAttribute("fill", isLiked ? "red" : "none");
       btn.setAttribute("stroke", isLiked ? "red" : "currentColor");
@@ -1123,6 +1129,13 @@ const response = await fetch("https://wordlinkapp.onrender.com/api/posts", {
   }
   
 });
+
+if (response.status === 401) {
+  localStorage.removeItem('token');
+  window.location.href = 'login.html';
+  return;
+}
+
     const data = await response.json()
     /* posts data include  username fullname content likes createdAt likes comments*/
     if (token){

@@ -376,6 +376,13 @@
                 const currentRes = await fetch(`${BASE_URL}/auths/profile`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                
+                if (currentRes.status === 401) {
+                    localStorage.removeItem('token');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
                 currentUser = await currentRes.json();
                 
                 // If no userId provided or userId matches current user, show own profile
@@ -515,6 +522,12 @@
                         method: "POST",
                         headers: { Authorization: `Bearer ${token}` },
                     });
+                    
+                    if (res.status === 401) {
+                        localStorage.removeItem('token');
+                        window.location.href = 'login.html';
+                        return;
+                    }
                     
                     if (!res.ok) {
                         btn.setAttribute("fill", isLiked ? "red" : "none");
