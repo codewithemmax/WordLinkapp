@@ -17,20 +17,20 @@ export function authenticateToken(req, res, next) {
 }
 
 export function optionalAuthenticateToken(req, res, next) {
-	  const authHeader = req.headers["authorization"];
-	    const token = authHeader && authHeader.split(" ")[1];
+	const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
 
-	      if (!token) {
-	      	    req.user = null; // guest user
-	      	        return next();
-	      	          }
+	if (!token) {
+		req.user = null; // guest user
+			return next();
+			}
 
-	      	            jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-	      	            	    if (err) {
-	      	            	    	      req.user = null; // invalid token treated as guest
-	      	            	    	            return next();
-	      	            	    	                }
-	      	            	    	                    req.user = user; // valid token
-	      	            	    	                        next();
-	      	            	    	                          });
-	      	      }
+		jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+			if (err) {
+				req.user = null; // invalid token treated as guest
+					return next();
+					}
+			req.user = user; // valid token
+			next();
+	});
+}
