@@ -8,7 +8,6 @@ import { Server } from "socket.io";
 import path from "path";
 import { fileURLToPath } from "url";
 import axios from 'axios';
-
 const url = `https://wordlinkapp.onrender.com/healthcheck`;
 const interval = 14 * 60 * 1000;
 
