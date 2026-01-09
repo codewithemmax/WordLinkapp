@@ -1,7 +1,4 @@
 // WebSocket client functions for real-time updates
-
-import { Query } from "mongoose";
-
 function updateCommentCount(postId, comments) {
   const postCard = document.querySelector(`[data-id="${postId}"]`);
   if (postCard) {
