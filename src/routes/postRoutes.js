@@ -1,5 +1,5 @@
-const express = require('express');
-const {
+import express from 'express';
+import {
   getPosts,
   createPost,
   getPost,
@@ -10,9 +10,9 @@ const {
   bookmarkPost,
   retweetPost,
   followUser
-} = require('../controllers/postController.js');
-const { optionalAuthenticateToken, authenticateToken } = require('../middleware/authMiddleware.js');
-const multer = require('multer');
+} from '../controllers/postController.js';
+import { optionalAuthenticateToken, authenticateToken } from '../middleware/authMiddleware.js';
+import multer from 'multer';
 
 const router = express.Router();
 const upload = multer({ 
@@ -30,4 +30,4 @@ router.post("/:id/bookmark", authenticateToken, bookmarkPost);
 router.post("/:id/retweet", authenticateToken, retweetPost);
 router.post("/follow/:userId", authenticateToken, followUser);
 
-module.exports = router;
+export default router;
