@@ -1,5 +1,5 @@
-import express from "express";
-import {
+const express = require('express');
+const {
   getPosts,
   createPost,
   getPost,
@@ -10,14 +10,14 @@ import {
   bookmarkPost,
   retweetPost,
   followUser
-} from "../controllers/postController.js";
-import { optionalAuthenticateToken, authenticateToken } from "../middleware/authMiddleware.js";
-import multer from 'multer'
+} = require('../controllers/postController.js');
+const { optionalAuthenticateToken, authenticateToken } = require('../middleware/authMiddleware.js');
+const multer = require('multer');
 
 const router = express.Router();
 const upload = multer({ 
   dest: 'uploads/',
-  limits: { fileSize: 5 * 1024 * 1024 }  // 5MB max
+  limits: { fileSize: 5 * 1024 * 1024 }
 });
 router.get("/", optionalAuthenticateToken, getPosts);
 router.post("/", authenticateToken, upload.single('image'), createPost);
@@ -30,4 +30,4 @@ router.post("/:id/bookmark", authenticateToken, bookmarkPost);
 router.post("/:id/retweet", authenticateToken, retweetPost);
 router.post("/follow/:userId", authenticateToken, followUser);
 
-export default router;
+module.exports = router;

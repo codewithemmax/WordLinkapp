@@ -1,8 +1,8 @@
-import jwt from "jsonwebtoken";
+const jwt = require('jsonwebtoken');
 
-export function authenticateToken(req, res, next) {
+function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1]; // get token after "Bearer"
+  const token = authHeader && authHeader.split(" ")[1];
 
   if (!token){
     return res
@@ -11,26 +11,29 @@ export function authenticateToken(req, res, next) {
     }
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ message: "Invalid token." });
-    req.user = user; // store decoded user info
-    next(); // continue to the next function (like post creation or liking)
+    req.user = user;
+    next();
   });
 }
 
-export function optionalAuthenticateToken(req, res, next) {
+function optionalAuthenticateToken(req, res, next) {
 	const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
 
 	if (!token) {
-		req.user = null; // guest user
+		req.user = null;
 			return next();
 			}
 
 		jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
 			if (err) {
-				req.user = null; // invalid token treated as guest
+				req.user = null;
 					return next();
 					}
-			req.user = user; // valid token
+			req.user = user;
 			next();
 	});
+}
+
+module.exports = { authenticateToken, optionalAuthenticateToken };
 }

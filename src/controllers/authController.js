@@ -1,9 +1,9 @@
-import User from "../models/UserModel.js";
-import Otp from "../models/OtpModel.js";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import { v2 as cloudinary } from 'cloudinary';
-import * as Brevo from '@getbrevo/brevo'; // Updated import
+const User = require('../models/UserModel.js');
+const Otp = require('../models/OtpModel.js');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const { v2: cloudinary } = require('cloudinary');
+const Brevo = require('@getbrevo/brevo');
 
 // Get all posts
 export const getProfile = async (req, res) => {
@@ -229,3 +229,13 @@ export const logIn = async (req, res) => {
   }
 };
 
+module.exports = {
+  getProfile,
+  check,
+  checkEmail,
+  signUp,
+  verifyOtp,
+  sendOtp,
+  updateProfile,
+  logIn
+};

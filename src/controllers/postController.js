@@ -1,8 +1,8 @@
-import Post from "../models/PostModel.js";
-import User from "../models/UserModel.js";
-import Notification from "../models/NotificationModel.js";
-import fs from "fs";
-import { v2 as cloudinary } from 'cloudinary';
+const Post = require("../models/PostModel.js");
+const User = require("../models/UserModel.js");
+const Notification = require("../models/NotificationModel.js");
+const fs = require("fs");
+const { v2: cloudinary } = require('cloudinary');
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -502,3 +502,16 @@ export const followUser = async (req, res) => {
   }
 };
 
+module.exports = {
+  createPost,
+  getPosts,
+  likePost,
+  commentPost,
+  replyToComment,
+  getPost,
+  deletePost,
+  updatePost,
+  bookmarkPost,
+  retweetPost,
+  followUser
+};

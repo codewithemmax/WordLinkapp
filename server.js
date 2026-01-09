@@ -1,13 +1,11 @@
-import 'dotenv/config';
-import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-import { createServer } from "http";
-import { Server } from "socket.io";
-
-import path from "path";
-import { fileURLToPath } from "url";
-import axios from 'axios';
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const path = require('path');
+const axios = require('axios');
 const url = `https://wordlinkapp.onrender.com/healthcheck`;
 const interval = 14 * 60 * 1000;
 
@@ -26,8 +24,7 @@ const io = new Server(server, {
 });
 
 app.use(express.urlencoded({ extended: true }));
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.resolve();
 
 app.use(express.static(__dirname));
 app.use(cors());
@@ -51,8 +48,8 @@ io.on('connection', (socket) => {
 });
 
 // Import routes
-import postRoutes from "./src/routes/postRoutes.js";
-import authRoutes from "./src/routes/authRoutes.js";
+const postRoutes = require('./src/routes/postRoutes.js');
+const authRoutes = require('./src/routes/authRoutes.js');
 app.use("/api/posts", postRoutes);
 app.use("/api/auths", authRoutes);
 

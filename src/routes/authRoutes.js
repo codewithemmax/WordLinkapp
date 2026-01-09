@@ -1,13 +1,12 @@
-import express from "express";
-import { logIn, check, checkEmail, signUp, getProfile, verifyOtp, sendOtp, updateProfile } from "../controllers/authController.js";
-import { authenticateToken } from "../middleware/authMiddleware.js";
-import multer from 'multer'
-import { verify } from "crypto";
+const express = require('express');
+const { logIn, check, checkEmail, signUp, getProfile, verifyOtp, sendOtp, updateProfile } = require('../controllers/authController.js');
+const { authenticateToken } = require('../middleware/authMiddleware.js');
+const multer = require('multer');
 
 const router = express.Router();
 const upload = multer({ 
   dest: 'uploads/',
-  limits: { fileSize: 5 * 1024 * 1024 }  // 5MB max
+  limits: { fileSize: 5 * 1024 * 1024 }
 });
 
 router.post("/signup", upload.single('image'), signUp);
@@ -19,4 +18,4 @@ router.post("/verify_otp", verifyOtp)
 router.post("/send_otp", sendOtp)
 router.put("/update-profile", authenticateToken, upload.single('profilePic'), updateProfile)
 
-export default router;
+module.exports = router;
